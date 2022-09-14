@@ -2,13 +2,22 @@ on:
   workflow_call:
     inputs:
       build_args:
-        required: true
+        required: false
+        default: ""
         description: "A newline delimited (| in yaml) string of Docker build-args"
         type: string
       version:
         required: true
         description: "GeoMatch tag to build for."
         type: string
+
+env:
+  GEOMATCH_VERSION: ${{ inputs.version }}
+  # Frustrating workaround becuase we can't use secrets as inputs.
+  # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
+  DOCKER_BUILD_ARGS: |
+    GEOMATCH_VERSION=${{ inputs.version }}
+    ${{ inputs.GEOMATCH_DOCKER_BUILD_ARGS }}
 
 jobs:
   build:
@@ -42,7 +51,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ inputs.build_args }}
+          build-args: ${{ env.DOCKER_BUILD_ARG }}
           push: false
           load: false # TODO might need to be true
           target: base
@@ -56,7 +65,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ inputs.build_args }}
+          build-args: ${{ env.DOCKER_BUILD_ARG }}
           push: false
           load: false
           target: builder
@@ -71,7 +80,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ inputs.build_args }}
+          build-args: ${{ env.DOCKER_BUILD_ARG }}
           push: true
           load: false
           target: production
