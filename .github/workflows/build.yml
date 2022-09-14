@@ -17,6 +17,7 @@ env:
   # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
   DOCKER_BUILD_ARGS: |
     GEOMATCH_VERSION=${{ inputs.version }}
+    CONTAINER_PORT=${{ secrets.AWS_GEOMATCH_ECR_CONTAINER_PORT }}
     ${{ secrets.GEOMATCH_DOCKER_BUILD_ARGS }}
     ${{ inputs.build_args }}
 
@@ -52,7 +53,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ secrets.GEOMATCH_DOCKER_BUILD_ARGS }}
+          build-args: ${{ env.DOCKER_BUILD_ARGS }}
           push: false
           load: false # TODO might need to be true
           target: base
@@ -66,7 +67,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ env.DOCKER_BUILD_ARG }}
+          build-args: ${{ env.DOCKER_BUILD_ARGS }}
           push: false
           load: false
           target: builder
@@ -81,7 +82,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args: ${{ env.DOCKER_BUILD_ARG }}
+          build-args: ${{ env.DOCKER_BUILD_ARGS }}
           push: true
           load: false
           target: production
