@@ -17,7 +17,8 @@ env:
   # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
   DOCKER_BUILD_ARGS: |
     GEOMATCH_VERSION=${{ inputs.version }}
-    ${{ inputs.GEOMATCH_DOCKER_BUILD_ARGS }}
+    ${{ secrets.GEOMATCH_DOCKER_BUILD_ARGS }}
+    ${{ inputs.build_args }}
 
 jobs:
   build:
