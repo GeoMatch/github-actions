@@ -10,6 +10,13 @@ on:
         required: true
         description: "GeoMatch tag to build for."
         type: string
+      geomatch_project:
+        required: true
+        description: "i.e. geomatch-us"
+        type: string
+
+# TODO: gha Cache doesn't work for tags?
+# https://github.com/docker/build-push-action/issues/433
 
 env:
   GEOMATCH_VERSION: ${{ inputs.version }}
@@ -47,6 +54,14 @@ jobs:
         # Creates alias of 'docker build' to 'docker buildx build'
         with:
           install: true
+      - name: Docker Cache 
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          # Key is named differently to avoid collision
+          key: ${{ runner.os }}-geomatch-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-geomatch
       - name: Build 'base' Image
         id: docker_build_base
         uses: docker/build-push-action@v3
@@ -58,9 +73,9 @@ jobs:
           load: false # TODO might need to be true
           target: base
           cache-from: |
-            type=gha,scope=base
+            type=local,src=/tmp/.buildx-cache/base
           cache-to: |
-            type=gha,scope=base,mode=max
+            type=local,src=/tmp/.buildx-cache-new/base,mode=max
       - name: Build 'builder' Image
         id: docker_build_builder
         uses: docker/build-push-action@v3
@@ -72,10 +87,10 @@ jobs:
           load: false
           target: builder
           cache-from: |
-            type=gha,scope=builder
-            type=gha,scope=base
+            type=local,src=/tmp/.buildx-cache/builder
+            type=local,src=/tmp/.buildx-cache-new/base
           cache-to: |
-            type=gha,scope=builder,mode=max
+            type=local,src=/tmp/.buildx-cache-new/builder,mode=max
       - name: Build 'production' image
         id: docker_build_production
         uses: docker/build-push-action@v3
@@ -87,14 +102,23 @@ jobs:
           load: false
           target: production
           cache-from: |
-            type=gha,scope=production
-            type=gha,scope=builder
-            type=gha,scope=base
+            type=local,src=/tmp/.buildx-cache/production
+            type=local,src=/tmp/.buildx-cache-new/builder
+            type=local,src=/tmp/.buildx-cache-new/base
           cache-to: |
-            type=gha,scope=production,mode=max
+            type=local,src=/tmp/.buildx-cache-new/production,mode=max
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
+      # This ugly bit is necessary if you don't want your cache to grow forever
+      # until it hits GitHub's limit of 5GB.
+      # Temp fix
+      # https://github.com/docker/build-push-action/issues/252
+      # https://github.com/moby/buildkit/issues/1896
+      - name: Overwrite Old Cache 
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
       # Consider using github action cache instead. See:
       # https://github.com/docker/build-push-action/issues/286#issuecomment-892900431
       # https://evilmartians.com/chronicles/build-images-on-github-actions-with-docker-layer-caching
