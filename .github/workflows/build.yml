@@ -71,7 +71,7 @@ jobs:
           cache-from: |
             type=local,src=/tmp/.buildx-cache/base
           cache-to: |
-            type=local,src=/tmp/.buildx-cache-new/base,mode=max
+            type=local,dest=/tmp/.buildx-cache-new/base,mode=max
       - name: Build 'builder' Image
         id: docker_build_builder
         uses: docker/build-push-action@v3
@@ -86,7 +86,7 @@ jobs:
             type=local,src=/tmp/.buildx-cache/builder
             type=local,src=/tmp/.buildx-cache-new/base
           cache-to: |
-            type=local,src=/tmp/.buildx-cache-new/builder,mode=max
+            type=local,dest=/tmp/.buildx-cache-new/builder,mode=max
       - name: Build 'production' image
         id: docker_build_production
         uses: docker/build-push-action@v3
@@ -102,7 +102,7 @@ jobs:
             type=local,src=/tmp/.buildx-cache-new/builder
             type=local,src=/tmp/.buildx-cache-new/base
           cache-to: |
-            type=local,src=/tmp/.buildx-cache-new/production,mode=max
+            type=local,dest=/tmp/.buildx-cache-new/production,mode=max
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
