@@ -10,10 +10,6 @@ on:
         required: true
         description: "GeoMatch tag to build for."
         type: string
-      geomatch_project:
-        required: true
-        description: "i.e. geomatch-us"
-        type: string
 
 # TODO: gha Cache doesn't work for tags?
 # https://github.com/docker/build-push-action/issues/433
