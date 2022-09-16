@@ -47,7 +47,7 @@ jobs:
       - name: Check If Container Is Already Built
         id: check
         run: |
-          V = $( \
+          V=$( \
             aws ecr batch-get-image \
             --repository-name ${{ secrets.AWS_GEOMATCH_ECR_REPO_NAME }} \
             --image-ids=imageTag=${{ inputs.version }} \
