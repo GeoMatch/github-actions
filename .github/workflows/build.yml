@@ -54,7 +54,6 @@ jobs:
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
           )
-          echo "version: $V"
           echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
   build:
     name: "Build Container"
