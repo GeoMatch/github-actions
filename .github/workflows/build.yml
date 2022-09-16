@@ -59,7 +59,7 @@ jobs:
   build:
     name: "Build Container"
     needs: [check]
-    if: needs.check.outputs.already-built == "true" 
+    if: needs.check.outputs.already-built == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
