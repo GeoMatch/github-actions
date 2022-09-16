@@ -47,17 +47,19 @@ jobs:
       - name: Check If Container Is Already Built
         id: check
         run: |
-          echo "::set-output name=built::$( \
+          V = $( \
             aws ecr batch-get-image \
             --repository-name ${{ secrets.AWS_GEOMATCH_ECR_REPO_NAME }} \
             --image-ids=imageTag=${{ inputs.version }} \
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
           )"
+          echo $V
+          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)
   build:
     name: "Build Container"
     needs: [check]
-    if: needs.check.outputs.already-built != ${{ inputs.version }}
+    if: needs.check.outputs.already-built == "true" 
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
