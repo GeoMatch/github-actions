@@ -95,9 +95,7 @@ jobs:
           push: true
           load: false
           cache-from: |
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest-cache"
+            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
             "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:builder"
             "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:base"
-          # Avoid inline caching so we keep the image slim
-          cache-to: |
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest-cache"
+          # Avoid caching so we keep the image slim
