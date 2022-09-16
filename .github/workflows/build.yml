@@ -25,7 +25,36 @@ env:
     ${{ inputs.build_args }}
 
 jobs:
+  check:
+    name: "Check If Container Already Exists"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      already-built: ${{ steps.check.outputs.built }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_BUILD_ROLE_ARN }}
+          role-session-name: ReleaseBuild
+          role-duration-seconds: 1000
+      - name: Check If Container Is Already Built
+        id: check
+        run: >
+          echo "::set-output name=built::$(
+            aws ecr batch-get-image
+            --repository-name ${{ secrets.AWS_GEOMATCH_ECR_REPO_NAME }}
+            --image-ids=imageTag=${{ inputs.version }}
+            --query 'images[].imageId.imageTag'
+            --output text | tr -d '[:space:]'
+          )"
   build:
+    name: "Build Container"
+    needs: [check]
+    if: needs.check.outputs.already-built != ${{ inputs.version }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
