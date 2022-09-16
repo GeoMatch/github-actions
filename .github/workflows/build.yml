@@ -28,7 +28,10 @@ jobs:
   check:
     name: "Check If Container Already Exists"
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
     outputs:
       already-built: ${{ steps.check.outputs.built }}
     steps:
@@ -39,7 +42,7 @@ jobs:
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_BUILD_ROLE_ARN }}
-          role-session-name: ReleaseBuild
+          role-session-name: ReleaseBuildCheck
           role-duration-seconds: 1000
       - name: Check If Container Is Already Built
         id: check
