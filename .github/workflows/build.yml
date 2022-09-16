@@ -53,13 +53,13 @@ jobs:
             --image-ids=imageTag=${{ inputs.version }} \
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
-          )"
-          echo $V
-          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)
+          )
+          echo "version: $V"
+          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
   build:
     name: "Build Container"
     needs: [check]
-    if: needs.check.outputs.already-built == 'true'
+    if: needs.check.outputs.already-built == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
