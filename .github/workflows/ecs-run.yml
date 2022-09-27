@@ -31,12 +31,12 @@ jobs:
           role-session-name: ECSRunFargateTask
           role-duration-seconds: 1000
       - name: Format to Docker CMD array
-        uses: ../actions/docker-cmd-format
+        uses: GeoMatch/github-actions/actions/docker-cmd-format
         id: command-format
         with:
           command: ${{ inputs.command }}
       - name: Run command
-        uses: ../actions/ecs-deploy
+        uses: GeoMatch/github-actions/actions/ecs-deploy
         with:
           args: >-
             run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
