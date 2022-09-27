@@ -9,10 +9,6 @@ on:
           An unspaced Docker CMD array will also work. Ex:
           ["python","manage.py","migrate"]
         type: string
-      aws-role-arn:
-        required: true
-        description: ARN for AWS role to run with
-        type: string
 
 jobs:
   check:
@@ -31,7 +27,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
-          role-to-assume: ${{ inputs.aws-role-arn }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
           role-session-name: ECSRunFargateTask
           role-duration-seconds: 300
       - name: Format to Docker CMD array
