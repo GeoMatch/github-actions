@@ -1,5 +1,9 @@
 on:
   workflow_call:
+    inputs:
+      role:
+        required: true
+        type: string
 
 env:
   # Frustrating workaround becuase we can't use secrets as inputs.
@@ -13,4 +17,4 @@ jobs:
     secrets: inherit
     with:
       command: "python manage.py migrate --no-input"
-      aws-role-arn: ${{ env.AWS_ROLE_ARN }}
+      aws-role-arn: ${{ inputs.role }}
