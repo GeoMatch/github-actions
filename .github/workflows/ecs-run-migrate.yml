@@ -1,29 +1,9 @@
 on: workflow_call
 
 jobs:
-  migrate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
-          role-session-name: ECSRunFargateTask
-          role-duration-seconds: 1000
-      - name: Run command
-        uses: GeoMatch/github-actions/actions/ecs-deploy@main
-        with:
-          args: >-
-            run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
-            --command ${{ secrets.AWS_GEOMATCH_ECS_CONTAINER_NAME }}
-            ["python","manage.py","migrate","--no-input"]
-            --launchtype FARGATE --public-ip
-            --subnet  ${{ secrets.AWS_GEOMATCH_TASK_SUBNET }}
-            --securitygroup  ${{ secrets.AWS_GEOMATCH_TASK_SECURITY_GROUP }}
+  ecs-run-migrate:
+    name: "ECS Run Migrate"
+    uses: ./.github/workflows/ecs-run.yml@main
+    secrets: inherit
+    with:
+      command: "python manage.py migrate --no-input"

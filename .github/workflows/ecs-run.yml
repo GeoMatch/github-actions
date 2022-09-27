@@ -1,0 +1,49 @@
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        description: >-
+          Command to be passed as the CMD to the ECS/Fargate container image.
+          Any string will try to be converted to a Docker CMD array.
+          An unspaced Docker CMD array will also work. Ex:
+          ["python","manage.py","migrate"]
+        type: string
+
+# TODO create user workflow that masks secret: https://github.com/actions/runner/issues/643
+
+jobs:
+  ecs-run:
+    name: "ECS Run"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_RUN_TASK_ROLE_ARN }}
+          role-session-name: ECSRunFargateTask
+          role-duration-seconds: 1000
+      - name: Format command as Docker CMD
+        id: command-format
+        uses: GeoMatch/github-actions/actions/ecs-deploy@main
+        with:
+          command: ${{ inputs.command }}
+      - name: Run command on ECS
+        uses: GeoMatch/github-actions/actions/ecs-deploy@main
+        # TODO: wait for task to run: https://stackoverflow.com/questions/67187368/how-do-wait-for-aws-ecs-task-to-be-in-running-state-before-moving-to-next-step-i
+        with:
+          args: >-
+            run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
+            --command ${{ secrets.AWS_GEOMATCH_ECS_CONTAINER_NAME }}
+            ${{ steps.command-format.outputs.output }}
+            ["python","manage.py","migrate","--no-input"]
+            --launchtype FARGATE --public-ip
+            --subnet  ${{ secrets.AWS_GEOMATCH_TASK_SUBNET }}
+            --securitygroup  ${{ secrets.AWS_GEOMATCH_TASK_SECURITY_GROUP }}
