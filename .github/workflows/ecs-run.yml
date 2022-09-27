@@ -29,7 +29,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
           role-session-name: ECSRunFargateTask
-          role-duration-seconds: 300
+          role-duration-seconds: 1000
       - name: Format to Docker CMD array
         uses: ./actions/docker-cmd-format
         id: command-format
