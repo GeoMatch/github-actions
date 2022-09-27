@@ -1,0 +1,11 @@
+on:
+  workflow_call:
+
+jobs:
+  migrate:
+    name: "ECS DB Migrate"
+    uses: ./.github/workflows/ecs-run.yml
+    secrets: inherit
+    with:
+      command: "python manage.py migrate --no-input"
+      aws-role-arn: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}

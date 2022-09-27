@@ -1,0 +1,13 @@
+# action.yml
+name: "Docker CMD Format"
+description: "Format a string as a Docker CMD array."
+inputs:
+  command:
+    description: "Command string"
+    required: true
+outputs:
+  output:
+    description: "Formatted command string"
+runs:
+  using: "node16"
+  main: "index.js"

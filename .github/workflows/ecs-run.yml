@@ -1,0 +1,51 @@
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        description: >-
+          Command to be passed as the CMD to the ECS/Fargate container image.
+          Any string will try to be converted to a Docker CMD array.
+          An unspaced Docker CMD array will also work. Ex:
+          ["python","manage.py","migrate"]
+        type: string
+      aws-role-arn:
+        required: true
+        description: ARN for AWS role to run with
+        type: string
+
+jobs:
+  check:
+    name: "Check If Container Already Exists"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      already-built: ${{ steps.check.outputs.built }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ inputs.aws-role-arn }}
+          role-session-name: ECSRunFargateTask
+          role-duration-seconds: 300
+      - name: Format to Docker CMD array
+        uses: ./actions/docker-cmd-format
+        id: command-format
+        with:
+          command: ${{ inputs.command }}
+      - name: Run command
+        uses: ./actions/ecs-deploy
+        with:
+          args: >-
+            run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
+            --command ${{ secrets.AWS_GEOMATCH_ECS_CONTAINER_NAME }}
+            ${{ steps.command-format.output }} 
+            --launchtype FARGATE --public-ip
+            --subnet  ${{ secrets.AWS_GEOMATCH_TASK_SUBNET }}
+            --securitygroup  ${{ secrets.AWS_GEOMATCH_TASK_SECURITY_GROUP }}

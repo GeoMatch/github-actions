@@ -1,0 +1,15 @@
+# action.yml
+name: "ECS Deploy"
+description: "Run arbitrary fabfuel/ecs-deploy commands."
+inputs:
+  args:
+    description: "Will pass everything here directly to ecs-deploy's ecs command"
+    required: true
+outputs:
+  result:
+    description: "Output provided by ecs deploy tool"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.args }}
