@@ -1,20 +1,24 @@
-on:
-  workflow_call:
-    inputs:
-      role:
-        required: true
-        type: string
-
-env:
-  # Frustrating workaround becuase we can't use secrets as inputs.
-  # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
-  AWS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
+on: workflow_call
 
 jobs:
+  # It's insane that this is needed.
+  # It's pretty much impossible to pass anything from env or secrets to "with" in a reusable workflow
+  render-secret:
+    name: "Add secret to variable"
+    runs-on: ubuntu-latest
+    outputs:
+      role: ${{ steps.out.outputs.role }}
+    steps:
+      - id: out
+        name: Output environment variables
+        run: echo "::set-output name=role::$(echo $AWS_ROLE_ARN)"
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
   migrate:
     name: "ECS DB Migrate"
+    needs: render-secret
     uses: ./.github/workflows/ecs-run.yml
     secrets: inherit
     with:
       command: "python manage.py migrate --no-input"
-      aws-role-arn: ${{ inputs.role }}
+      aws-role-arn: ${{ needs.render-secret.outputs.role }}
