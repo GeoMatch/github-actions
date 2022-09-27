@@ -43,7 +43,6 @@ jobs:
             run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
             --command ${{ secrets.AWS_GEOMATCH_ECS_CONTAINER_NAME }}
             ${{ steps.command-format.outputs.output }}
-            ["python","manage.py","migrate","--no-input"]
             --launchtype FARGATE --public-ip
             --subnet  ${{ secrets.AWS_GEOMATCH_TASK_SUBNET }}
             --securitygroup  ${{ secrets.AWS_GEOMATCH_TASK_SECURITY_GROUP }}
