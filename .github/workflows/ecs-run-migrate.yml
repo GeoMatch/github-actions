@@ -1,10 +1,16 @@
 on:
   workflow_call:
 
+env:
+  # Frustrating workaround becuase we can't use secrets as inputs.
+  # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
+  AWS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
+
 jobs:
   migrate:
     name: "ECS DB Migrate"
     uses: ./.github/workflows/ecs-run.yml
+    secrets: inherit
     with:
       command: "python manage.py migrate --no-input"
-      aws-role-arn: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
+      aws-role-arn: ${{ env.AWS_ROLE_ARN }}
