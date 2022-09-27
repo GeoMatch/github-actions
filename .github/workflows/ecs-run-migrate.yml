@@ -1,24 +1,29 @@
 on: workflow_call
 
 jobs:
-  # It's insane that this is needed.
-  # It's pretty much impossible to pass anything from env or secrets to "with" in a reusable workflow
-  render-secret:
-    name: "Add secret to variable"
-    runs-on: ubuntu-latest
-    outputs:
-      role: ${{ steps.out.outputs.role }}
-    steps:
-      - id: out
-        name: Output environment variables
-        run: echo "::set-output name=role::$(echo $AWS_ROLE_ARN)"
-        env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
   migrate:
-    name: "ECS DB Migrate"
-    needs: render-secret
-    uses: ./.github/workflows/ecs-run.yml
-    secrets: inherit
-    with:
-      command: "python manage.py migrate --no-input"
-      aws-role-arn: ${{ needs.render-secret.outputs.role }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_MIGRATE_ROLE_ARN }}
+          role-session-name: ECSRunFargateTask
+          role-duration-seconds: 1000
+      - name: Run command
+        uses: GeoMatch/github-actions/actions/ecs-deploy@main
+        with:
+          args: >-
+            run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1
+            --command ${{ secrets.AWS_GEOMATCH_ECS_CONTAINER_NAME }}
+            ["python","manage.py","migrate","--no-input"]
+            --launchtype FARGATE --public-ip
+            --subnet  ${{ secrets.AWS_GEOMATCH_TASK_SUBNET }}
+            --securitygroup  ${{ secrets.AWS_GEOMATCH_TASK_SECURITY_GROUP }}
