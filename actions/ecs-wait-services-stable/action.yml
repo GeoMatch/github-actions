@@ -1,0 +1,10 @@
+# action.yml
+name: "ECS Wait Until Services Stable"
+description: "Waits for an ECS service to deploy"
+inputs:
+  ecs-run-task-config:
+    description: Config for ECS run task (in JSON)
+    required: true
+runs:
+  using: "node16"
+  main: "index.js"
