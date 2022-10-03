@@ -12,7 +12,6 @@ const run = async () => {
   try {
     const ssmName = core.getInput("ssm-name");
     const val = await getSSMParam(ssmName);
-    console.log(val);
     core.setOutput("value", val);
   } catch (error) {
     core.setFailed(error.message);

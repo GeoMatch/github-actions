@@ -43,5 +43,5 @@ jobs:
       - name: Run command on ECS
         uses: GeoMatch/github-actions/actions/ecs-run-sync@main
         with:
-          config: ${{ steps.config.outputs.value }}
+          ecs-run-task-config: ${{ steps.config.outputs.value }}
           command: ${{ inputs.command }}
