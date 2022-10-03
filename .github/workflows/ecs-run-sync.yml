@@ -30,11 +30,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_RUN_TASK_ROLE_ARN }}
           role-session-name: ECSRunFargateTask
           role-duration-seconds: 1000
-      - name: Set up secret file
-        env:
-          ARN: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_ARN }}
-        run: |
-          echo ${{secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_ARN}} | sed 's/./& /g'
       - name: Get ECS Run Task Config
         uses: GeoMatch/github-actions/actions/ssm-get-param@main
         id: config
