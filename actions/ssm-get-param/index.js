@@ -11,6 +11,7 @@ const getSSMParam = async (path) => {
 const run = async () => {
   try {
     const ssmPath = core.getInput("ssm-path");
+    console.log(ssmPath);
     const val = await getSSMParam(ssmPath);
     console.log(val);
     core.setOutput("value", val);
