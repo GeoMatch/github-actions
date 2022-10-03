@@ -1,0 +1,22 @@
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "The version to release (v*.*.*) or 'false' if this is not a release commit."
+        value: ${{ jobs.detect.outputs.version }}
+
+jobs:
+  detect:
+    name: "Detect If Is Release"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      version: ${{ steps.check.outputs.release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check If Release
+        id: check
+        run: |
+          LATEST_MESSAGE=$(git show -s --format=%B HEAD)
+          echo "::set-output name=release::$([[ $LATEST_MESSAGE = \[release\]* ]] && echo $(cat VERSION) || echo false)"
