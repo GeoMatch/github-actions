@@ -1,0 +1,20 @@
+# action.yml
+name: "ECS Run Task Sync"
+description: "Run an ECS Fargate task and wait until STOPPED."
+inputs:
+  ecs-run-task-config:
+    description: Config for ECS run task (in JSON)
+    required: true
+  command:
+    description: >-
+      Command to be passed as the CMD to the ECS/Fargate container image.
+      Any string will try to be converted to a Docker CMD array.
+      An unspaced Docker CMD array will also work. Ex:
+      ["python","manage.py","migrate"]
+    required: true
+outputs:
+  task-arn:
+    description: "The ECS's tasks ARN."
+runs:
+  using: "node16"
+  main: "index.js"

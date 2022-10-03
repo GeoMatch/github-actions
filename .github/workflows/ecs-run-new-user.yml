@@ -1,0 +1,9 @@
+on: workflow_call
+
+jobs:
+  ecs-run-new-user:
+    name: "ECS Run New User"
+    uses: ./.github/workflows/ecs-run.yml
+    secrets: inherit
+    with:
+      command: "python manage.py migrate --no-input"

@@ -1,0 +1,42 @@
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        description: >-
+          Command to be passed as the CMD to the ECS/Fargate container image.
+          Any string will try to be converted to a Docker CMD array.
+          An unspaced Docker CMD array will also work. Ex:
+          ["python","manage.py","migrate"]
+        type: string
+
+# TODO create user workflow that masks secret: https://github.com/actions/runner/issues/643
+
+jobs:
+  ecs-run:
+    name: "ECS Run"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_RUN_TASK_ROLE_ARN }}
+          role-session-name: ECSRunFargateTask
+          role-duration-seconds: 1000
+      - name: Get ECS Run Task Config
+        uses: GeoMatch/github-actions/actions/ssm-get-param@main
+        id: config
+        with:
+          ssm-path: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_ARN }}
+      - name: Run command on ECS
+        uses: GeoMatch/github-actions/actions/ecs-run-sync@main
+        with:
+          config: ${{ steps.config.outputs.value }}
+          command: ${{ inputs.command }}

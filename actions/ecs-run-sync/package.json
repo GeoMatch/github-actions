@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@actions/core": "^1.9.1",
+    "@aws-sdk/client-ecs": "^3.181.0"
+  }
+}

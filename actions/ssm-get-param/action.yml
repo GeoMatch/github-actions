@@ -1,0 +1,13 @@
+# action.yml
+name: "SSM Get Param"
+description: "Get an AWS SSM parameter"
+inputs:
+  ssm-path:
+    description: SSM full path.
+    required: true
+outputs:
+  value:
+    description: "SSM param value"
+runs:
+  using: "node16"
+  main: "index.js"

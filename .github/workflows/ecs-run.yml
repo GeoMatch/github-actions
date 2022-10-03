@@ -38,6 +38,7 @@ jobs:
       - name: Run command on ECS
         uses: GeoMatch/github-actions/actions/ecs-deploy@main
         # TODO: wait for task to run: https://stackoverflow.com/questions/67187368/how-do-wait-for-aws-ecs-task-to-be-in-running-state-before-moving-to-next-step-i
+        # https://github.com/buildkite/ecs-run-task
         with:
           args: >-
             run ${{ secrets.AWS_GEOMATCH_CLUSTER_NAME }} ${{ secrets.AWS_GEOMATCH_TASK_FAMILY_NAME }} 1

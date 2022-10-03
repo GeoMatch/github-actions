@@ -3,7 +3,7 @@ on: workflow_call
 jobs:
   ecs-run-migrate:
     name: "ECS Run Migrate"
-    uses: ./.github/workflows/ecs-run.yml
+    uses: ./.github/workflows/ecs-run-sync.yml
     secrets: inherit
     with:
       command: "python manage.py migrate --no-input"
