@@ -31,12 +31,12 @@ jobs:
           role-session-name: ECSRunFargateTask
           role-duration-seconds: 1000
       - name: Get ECS Run Task Config
-        uses: GeoMatch/github-actions/actions/ssm-get-param@main
+        uses: GeoMatch/deployment/.github/actions/ssm-get-param@main
         id: config
         with:
           ssm-name: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_NAME }}
       - name: Run command on ECS
-        uses: GeoMatch/github-actions/actions/ecs-run-sync@main
+        uses: GeoMatch/deployment/.github/actions/ecs-run-sync@main
         with:
           ecs-run-task-config: ${{ steps.config.outputs.value }}
           command: ${{ inputs.command }}
