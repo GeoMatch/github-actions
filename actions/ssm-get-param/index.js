@@ -1,18 +1,17 @@
 import core from "@actions/core";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 
-const getSSMParam = async (path) => {
+const getSSMParam = async (name) => {
   const ssmClient = new SSMClient();
-  const getCommand = new GetParameterCommand({ Name: path });
+  const getCommand = new GetParameterCommand({ Name: name });
   const getCommandResult = await ssmClient.send(getCommand);
   return getCommandResult.Parameter.Value;
 };
 
 const run = async () => {
   try {
-    const ssmPath = core.getInput("ssm-path");
-    console.log(ssmPath);
-    const val = await getSSMParam(ssmPath);
+    const ssmName = core.getInput("ssm-name");
+    const val = await getSSMParam(ssmName);
     console.log(val);
     core.setOutput("value", val);
   } catch (error) {

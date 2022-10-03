@@ -39,7 +39,7 @@ jobs:
         uses: GeoMatch/github-actions/actions/ssm-get-param@main
         id: config
         with:
-          ssm-path: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_ARN }}
+          ssm-name: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_NAME }}
       - name: Run command on ECS
         uses: GeoMatch/github-actions/actions/ecs-run-sync@main
         with:

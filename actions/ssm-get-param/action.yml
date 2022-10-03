@@ -2,8 +2,8 @@
 name: "SSM Get Param"
 description: "Get an AWS SSM parameter"
 inputs:
-  ssm-path:
-    description: SSM full path.
+  ssm-name:
+    description: SSM full name.
     required: true
 outputs:
   value:
