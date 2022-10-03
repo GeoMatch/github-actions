@@ -7,8 +7,10 @@ import {
 
 const runTaskSync = async (runTaskConfig, cmd) => {
   let command = cmd;
-  if (!(command.startsWith("[") && command.endsWith("]"))) {
-    command = JSON.stringify(command.split(" "));
+  if (command.startsWith("[") && command.endsWith("]")) {
+    command = JSON.parse(command);
+  } else {
+    command = command.split(" ");
   }
 
   const ecsClient = new ECSClient();
@@ -55,7 +57,6 @@ const run = async () => {
     );
     core.setOutput("task-arn", taskArn);
   } catch (error) {
-    console.trace("Error");
     core.setFailed(error.stack);
   }
 };
