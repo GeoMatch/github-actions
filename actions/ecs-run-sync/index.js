@@ -11,7 +11,7 @@ const runTaskSync = async (runTaskConfig, cmd) => {
     command = JSON.stringify(command.split(" "));
   }
 
-  const ecsClient = new ECSClient({ region: runTaskConfig.AWS_REGION });
+  const ecsClient = new ECSClient();
   const runTaskCommand = new RunTaskCommand({
     count: 1,
     launchType: "FARGATE",
@@ -55,7 +55,8 @@ const run = async () => {
     );
     core.setOutput("task-arn", taskArn);
   } catch (error) {
-    core.setFailed(error.message);
+    console.trace("Error");
+    core.setFailed(error.stack);
   }
 };
 
