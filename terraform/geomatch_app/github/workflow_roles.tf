@@ -204,7 +204,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
       {
         "Action" : "s3:*",
         "Effect" : "Allow",
-        "Resource" : ["${aws_s3_bucket.state.arn}", "${aws_s3_bucket.state.arn}/*"]
+        "Resource" : ["${data.aws_s3_bucket.state.arn}", "${data.aws_s3_bucket.state.arn}/*"]
       },
       # AWS IAM doesn't support scoped task def permissions.
       # https://github.com/aws/containers-roadmap/issues/929
