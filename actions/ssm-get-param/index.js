@@ -1,4 +1,4 @@
-const core = require("@actions/core");
+import core from "@actions/core";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 
 const getSSMParam = async (path) => {
