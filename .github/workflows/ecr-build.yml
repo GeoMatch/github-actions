@@ -56,7 +56,7 @@ jobs:
           )
           echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
   build:
-    name: "Build Container"
+    name: "Build / Push Container"
     needs: [check]
     if: needs.check.outputs.already-built == 'false'
     runs-on: ubuntu-latest
