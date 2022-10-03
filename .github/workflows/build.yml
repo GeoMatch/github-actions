@@ -85,36 +85,7 @@ jobs:
           install: true
       # TODO: Change back to setup of commit 314fea7adcc6a6bccc41cf86ba98203a3d383d9b
       # once https://github.com/aws/containers-roadmap/issues/876 is resolved.
-      - name: Build 'base' stage image
-        id: docker_build_base
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: Dockerfile
-          build-args: ${{ env.DOCKER_BUILD_ARGS }}
-          push: true
-          load: false
-          tags: "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:base"
-          target: base
-          cache-from: |
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:base"
-          cache-to: "type=inline"
-      - name: Build 'builder' stage image
-        id: docker_build_builder
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: Dockerfile
-          build-args: ${{ env.DOCKER_BUILD_ARGS }}
-          push: true
-          load: false
-          tags: "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:builder"
-          target: builder
-          cache-from: |
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:builder"
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:base"
-          cache-to: "type=inline"
-      - name: Build 'production' stage image
+      - name: Build 'production' image
         id: docker_build_production
         uses: docker/build-push-action@v3
         with:
@@ -127,8 +98,5 @@ jobs:
           target: production
           push: true
           load: false
-          cache-from: |
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:builder"
-            "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:base"
-          # Avoid caching so we keep the image slim
+          cache-from: "type=gha,scope=prod"
+          cache-to: "type=gha,scope=prod,mode=max"
