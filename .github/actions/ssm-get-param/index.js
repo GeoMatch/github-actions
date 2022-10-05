@@ -3,7 +3,10 @@ import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 
 const getSSMParam = async (name) => {
   const ssmClient = new SSMClient();
-  const getCommand = new GetParameterCommand({ Name: name });
+  const getCommand = new GetParameterCommand({
+    Name: name,
+    WithDecryption: true,
+  });
   const getCommandResult = await ssmClient.send(getCommand);
   return getCommandResult.Parameter.Value;
 };
