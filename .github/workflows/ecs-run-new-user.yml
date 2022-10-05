@@ -1,9 +1,64 @@
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      email:
+        required: true
+        description: Email
+        type: string
+      superuser:
+        required: true
+        description: "'true' or 'false'"
+        type: string
+      staff:
+        required: true
+        description: "'true' or 'false'"
+        type: string
+      extra-args:
+        required: false
+        description: "Extra args to pass to command"
+        type: string
+        default: ""
 
 jobs:
-  ecs-run-new-user:
+  new-user:
     name: "ECS Run New User"
-    uses: ./.github/workflows/ecs-run.yml
-    secrets: inherit
-    with:
-      command: "python manage.py migrate --no-input"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ECS_RUN_TASK_ROLE_ARN }}
+          role-session-name: ECSRunFargateTask
+          role-duration-seconds: 1000
+      - name: Get ECS Run Task Config
+        uses: GeoMatch/deployment/.github/actions/ssm-get-param@main
+        id: config
+        with:
+          ssm-name: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_NAME }}
+      - name: Get New User Password
+        uses: GeoMatch/deployment/.github/actions/ssm-get-param@main
+        id: pass
+        with:
+          ssm-name: ${{ secrets.AWS_GEOMATCH_NEW_USER_PASSWORD_SSM_NAME }}
+      - name: Format
+        id: format
+        run: |
+          STAFF=$([[ 'true' == ${{ inputs.staff }} ]] && echo "--staff" || echo "")
+          SUPER=$([[ 'true' == ${{ inputs.superuser }} ]] && echo "--superuser" || echo "")
+          OUT=$(echo "python manage.py newuser ${{ inputs.email }} ${{ steps.pass.outputs.value }} ${{ inputs.extra-args }} $STAFF $SUPER")
+          echo $OUT
+          echo "::add-mask::$OUT"
+          echo $OUT
+          echo "::set-output name=command::$OUT"
+      - name: Run command on ECS
+        uses: GeoMatch/deployment/.github/actions/ecs-run-sync@main
+        with:
+          ecs-run-task-config: ${{ steps.config.outputs.value }}
+          command: ${{ steps.format.outputs.command }}
