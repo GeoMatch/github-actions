@@ -14,10 +14,14 @@ variable "aws_region" {
   type = string
 }
 
+variable "github_geomatch_app_repo" {
+  type        = string
+  description = "e.g. org_name/repo_name"
+}
+
 variable "ecr_module" {
   sensitive = true
   type = object({
-    github_geomatch_app_repo    = string
     geomatch_app_container_port = number
     geomatch_app_ecr_repo_url   = string
     geomatch_app_ecr_repo_name  = string

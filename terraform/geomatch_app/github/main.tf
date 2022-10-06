@@ -16,7 +16,7 @@ terraform {
 
 
 locals {
-  app_repo   = var.ecr_module.github_geomatch_app_repo
+  app_repo   = var.github_geomatch_app_repo
   repo_owner = split("/", local.app_repo)[0]
   repo_name  = split("/", local.app_repo)[1]
 }
