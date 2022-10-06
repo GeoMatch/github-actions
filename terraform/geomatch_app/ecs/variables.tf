@@ -47,9 +47,6 @@ variable "ecr_module" {
   type = object({
     geomatch_app_ecr_repo_url   = string
     geomatch_app_container_port = number
-    codebuild_project_name      = string
-    codebuild_project_arn       = string
-    codebuild_log_group_arn     = string
   })
 }
 
