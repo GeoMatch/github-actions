@@ -26,9 +26,6 @@ variable "ecr_module" {
     geomatch_app_ecr_repo_url   = string
     geomatch_app_ecr_repo_name  = string
     geomatch_app_ecr_repo_arn   = string
-    codebuild_project_arn       = string
-    codebuild_project_name      = string
-    codebuild_log_group_arn     = string
   })
 }
 
