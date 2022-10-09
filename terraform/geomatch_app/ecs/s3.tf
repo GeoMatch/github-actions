@@ -7,6 +7,7 @@ resource "aws_s3_bucket" "app" {
   }
 }
 
+# TODO(P1): Consider bucket versioning
 resource "aws_s3_bucket_acl" "app" {
   bucket = aws_s3_bucket.app.id
   acl    = "private"
