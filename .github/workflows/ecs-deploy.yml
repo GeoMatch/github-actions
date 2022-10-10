@@ -1,0 +1,53 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        description: "GeoMatch version tag to build for (i.e. v0.0.1)."
+        type: string
+
+jobs:
+  terraform-deploy:
+    name: "ECS Terraform Deploy"
+    needs: terraform-deploy
+    uses: ./.github/workflows/ecs-terraform-deploy.yml
+    secrets: inherit
+    with:
+      version: ${{ inputs.version }} 
+  ecs-run-migrate-and-static:
+    name: "ECS Run migrate and collectstatic"
+    needs: terraform-deploy
+    uses: ./.github/workflows/ecs-run-sync.yml
+    secrets: inherit
+    with:
+      command: "python manage.py migrate --no-input && python manage.py collectstatic --no-input"
+      shell-form: "true" # Needed to run multiple commands with Docker CMD
+  # TODO: job 'check-migrate-success'
+  # TODO: job 'rollback' if check-migrate-success is failure. could this be recursive?
+  ecs-wait:
+    name: "ECS Wait For Deploy"
+    runs-on: ubuntu-latest
+    needs: terraform-deploy
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+    # concurrency:
+    #   group: failure-${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_TERRAFORM_ECS_DEPLOY_ROLE_ARN }}
+          role-session-name: ECSDeployWait
+          role-duration-seconds: 1200
+      - name: Get ECS Run Task Config
+        uses: GeoMatch/deployment/.github/actions/ssm-get-param@main
+        id: config
+        with:
+          ssm-name: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_NAME }}
+      - name: Wait for ECS Deploy
+        uses: GeoMatch/deployment/.github/actions/ecs-wait-services-stable@main
+        with:
+          ecs-run-task-config: ${{ steps.config.outputs.value }}

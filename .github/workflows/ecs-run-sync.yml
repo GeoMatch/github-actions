@@ -9,6 +9,13 @@ on:
           An unspaced Docker CMD array will also work. Ex:
           ["python","manage.py","migrate"]
         type: string
+      shell-form:
+        description: >-
+          By default, this action uses the Docker CMD exec form. Set this to
+          anything other than 'false' to use the shell-form
+        required: false
+        type: string
+        default: "false"
 
 # TODO create user workflow that masks secret: https://github.com/actions/runner/issues/643
 
@@ -21,8 +28,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

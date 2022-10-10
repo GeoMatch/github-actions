@@ -42,21 +42,5 @@ jobs:
           role-duration-seconds: 1200
       - name: Terraform Apply
         run: terraform apply prod.plan
-      - name: Get ECS Run Task Config
-        uses: GeoMatch/deployment/.github/actions/ssm-get-param@main
-        id: config
-        with:
-          ssm-name: ${{ secrets.AWS_GEOMATCH_ECS_RUN_TASK_CONFIG_SSM_NAME }}
-      - name: Wait for ECS Deploy
-        uses: GeoMatch/deployment/.github/actions/ecs-wait-services-stable@main
-        with:
-          ecs-run-task-config: ${{ steps.config.outputs.value }}
       - if: ${{ always() }}
         run: rm prod.plan || true
-  ecs-run-collectstatic:
-    name: "ECS Run collectstatic"
-    needs: terraform-deploy
-    uses: ./.github/workflows/ecs-run-sync.yml
-    secrets: inherit
-    with:
-      command: "python manage.py collectstatic --no-input"

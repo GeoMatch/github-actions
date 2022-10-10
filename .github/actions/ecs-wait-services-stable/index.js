@@ -4,7 +4,7 @@ import { ECSClient, waitUntilServicesStable } from "@aws-sdk/client-ecs";
 const ecsWait = async (runTaskConfig) => {
   const ecsClient = new ECSClient();
   await waitUntilServicesStable(
-    { client: ecsClient, maxWaitTime: 1000, maxDelay: 120, minDelay: 15 },
+    { client: ecsClient, maxWaitTime: 15 * 60, maxDelay: 30, minDelay: 15 },
     {
       cluster: runTaskConfig.AWS_GEOMATCH_CLUSTER_ARN,
       services: [runTaskConfig.AWS_GEOMATCH_SERVICE_NAME],

@@ -5,11 +5,11 @@ import {
   waitUntilTasksStopped,
 } from "@aws-sdk/client-ecs";
 
-const runTaskSync = async (runTaskConfig, cmd) => {
+const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
   let command = cmd;
-  if (command.startsWith("[") && command.endsWith("]")) {
+  if (useExecForm && command.startsWith("[") && command.endsWith("]")) {
     command = JSON.parse(command);
-  } else {
+  } else if (useExecForm) {
     command = command.split(" ");
   }
 
@@ -52,7 +52,8 @@ const run = async () => {
     const config = core.getInput("ecs-run-task-config");
     const taskArn = await runTaskSync(
       JSON.parse(config),
-      core.getInput("command")
+      core.getInput("command"),
+      core.getInput("shell-form") === "false"
     );
     core.setOutput("task-arn", taskArn);
   } catch (error) {
