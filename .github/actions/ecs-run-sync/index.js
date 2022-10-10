@@ -6,11 +6,13 @@ import {
 } from "@aws-sdk/client-ecs";
 
 const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
-  let command = cmd;
+  let command;
   if (useExecForm && command.startsWith("[") && command.endsWith("]")) {
     command = JSON.parse(command);
   } else if (useExecForm) {
     command = command.split(" ");
+  } else {
+    command = ["sh", "-c", cmd];
   }
 
   const ecsClient = new ECSClient();
