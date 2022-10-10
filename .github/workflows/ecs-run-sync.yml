@@ -45,3 +45,4 @@ jobs:
         with:
           ecs-run-task-config: ${{ steps.config.outputs.value }}
           command: ${{ inputs.command }}
+          shell-form: ${{ inputs.shell-form }}
