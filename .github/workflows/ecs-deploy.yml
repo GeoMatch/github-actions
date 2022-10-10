@@ -9,11 +9,10 @@ on:
 jobs:
   terraform-deploy:
     name: "ECS Terraform Deploy"
-    needs: terraform-deploy
     uses: ./.github/workflows/ecs-terraform-deploy.yml
     secrets: inherit
     with:
-      version: ${{ inputs.version }} 
+      version: ${{ inputs.version }}
   ecs-run-migrate-and-static:
     name: "ECS Run migrate and collectstatic"
     needs: terraform-deploy
