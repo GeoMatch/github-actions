@@ -10,7 +10,7 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
   if (useExecForm && cmd.startsWith("[") && cmd.endsWith("]")) {
     command = JSON.parse(cmd);
   } else if (useExecForm) {
-    command = command.split(" ");
+    command = cmd.split(" ");
   } else {
     command = ["sh", "-c", cmd];
   }
