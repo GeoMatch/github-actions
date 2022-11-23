@@ -7,8 +7,8 @@ import {
 
 const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
   let command;
-  if (useExecForm && command.startsWith("[") && command.endsWith("]")) {
-    command = JSON.parse(command);
+  if (useExecForm && cmd.startsWith("[") && cmd.endsWith("]")) {
+    command = JSON.parse(cmd);
   } else if (useExecForm) {
     command = command.split(" ");
   } else {
