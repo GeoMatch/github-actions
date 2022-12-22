@@ -85,6 +85,7 @@ jobs:
           install: true
       # TODO: Change back to setup of commit 314fea7adcc6a6bccc41cf86ba98203a3d383d9b
       # once https://github.com/aws/containers-roadmap/issues/876 is resolved.
+      # Also gha cache has 7 day expiry fyi
       - name: Build 'production' image
         id: docker_build_production
         uses: docker/build-push-action@v3
