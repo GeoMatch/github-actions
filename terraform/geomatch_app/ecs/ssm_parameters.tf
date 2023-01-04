@@ -34,7 +34,7 @@ resource "aws_ssm_parameter" "ecs_run_task_config" {
     "AWS_GEOMATCH_CLUSTER_ARN"           = aws_ecs_cluster.this.arn
     "AWS_GEOMATCH_SERVICE_NAME"          = aws_ecs_service.this.name
     "AWS_GEOMATCH_TASK_DEF_ARN"          = aws_ecs_task_definition.this.arn
-    "AWS_GEOMATCH_TASK_SUBNET"           = data.aws_subnets.public.ids[0]
+    "AWS_GEOMATCH_TASK_SUBNET"           = aws_ecs_service.this.network_configuration[0].subnets[0]
     "AWS_GEOMATCH_TASK_SECURITY_GROUP"   = aws_security_group.app.id
   })
 

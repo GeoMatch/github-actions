@@ -28,9 +28,12 @@ variable "geomatch_subdomain" {
 
 variable "networking_module" {
   type = object({
-    vpc_id           = string
-    private_tier_tag = string
-    public_tier_tag  = string
+    vpc_id                     = string
+    private_tier_tag           = string
+    public_tier_tag            = string
+    one_zone_az_name           = string
+    one_zone_public_subnet_id  = string
+    one_zone_private_subnet_id = string
   })
 }
 
@@ -47,6 +50,14 @@ variable "ecr_module" {
   type = object({
     geomatch_app_ecr_repo_url   = string
     geomatch_app_container_port = number
+  })
+}
+
+variable "efs_module" {
+  sensitive = true
+  type = object({
+    file_system_id  = string
+    file_system_arn = string
   })
 }
 

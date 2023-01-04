@@ -1,0 +1,1 @@
+This module was largely setup by following [this AWS blog post](https://aws.amazon.com/blogs/containers/developers-guide-to-using-amazon-efs-with-amazon-ecs-and-aws-fargate-part-3/) about setting up ECS with an EFS volume.

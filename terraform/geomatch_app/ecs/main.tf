@@ -69,6 +69,27 @@ resource "aws_iam_role" "ecs_task" {
     })
   }
 
+  inline_policy {
+    name = "efs_policy"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "elasticfilesystem:ClientMount",
+            "elasticfilesystem:ClientWrite"
+          ],
+          "Resource" : var.efs_module.file_system_arn,
+          "Condition" : {
+            "StringEquals" : {
+              "elasticfilesystem:AccessPointArn" : aws_efs_access_point.this.arn
+            }
+          }
+        }
+      ]
+    })
+  }
   tags = {
     Project     = var.project
     Environment = var.environment
@@ -151,9 +172,12 @@ locals {
   container_name         = "${var.project}-${var.environment}-app-container"
   task_definition_family = "${var.project}-${var.environment}-app-task-def"
   // Default AZ for the db and app. AWS may change AZ if default goes down.
-  default_zone       = data.aws_availability_zones.this.names[0]
-  container_port     = tostring(var.ecr_module.geomatch_app_container_port)
-  container_port_num = tonumber(local.container_port)
+  one_zone_az_name          = var.networking_module.one_zone_az_name
+  one_zone_public_subnet_id = var.networking_module.one_zone_public_subnet_id
+  container_port            = tostring(var.ecr_module.geomatch_app_container_port)
+  container_port_num        = tonumber(local.container_port)
+  app_efs_volume_name       = "${var.project}-${var.environment}-efs-volume"
+  app_efs_container_path    = "/data/efs" # in container
 }
 
 resource "aws_ecs_task_definition" "this" {
@@ -209,6 +233,10 @@ resource "aws_ecs_task_definition" "this" {
           "name" : "CONTAINER_PORT",
           "value" : local.container_port
         },
+        {
+          "name" : "EFS_DIR",
+          "value" : local.app_efs_container_path
+        },
       ],
       "secrets" : [
         {
@@ -258,11 +286,28 @@ resource "aws_ecs_task_definition" "this" {
       ],
       # The below are specified because otherwise AWS will silently write these
       # which will cause a diff during the next 'terraform apply'
-      "mountPoints" : [],
-      "volumesFrom" : [],
       "cpu" : 0,
+      "volumesFrom" : [],
+      "mountPoints" : [
+        {
+          "sourceVolume" : local.app_efs_volume_name,
+          "containerPath" : local.app_efs_container_path,
+          "readOnly" : false
+        }
+      ]
     }
   ])
+  volume {
+    name = local.app_efs_volume_name
+    efs_volume_configuration {
+      file_system_id    = var.efs_module.file_system_id
+      transitEncryption = "ENABLED"
+      authorization_config {
+        access_point_id = aws_efs_access_point.this.id
+        iam             = "ENABLED"
+      }
+    }
+  }
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
   requires_compatibilities = ["FARGATE"]
@@ -294,14 +339,13 @@ resource "aws_ecs_service" "this" {
     # security_groups = [aws_security_group.allow_internal.id]
     # Public subnet becuase Fargate 1.4 needs outbound connections to AWS resources:
     # https://stackoverflow.com/questions/61265108/aws-ecs-fargate-resourceinitializationerror-unable-to-pull-secrets-or-registry
-    subnets          = data.aws_subnets.public.ids
+    subnets          = [local.one_zone_public_subnet_id]
     assign_public_ip = true
 
     // Do we need both security groups here?
     // This is from https://dev.to/thnery/create-an-aws-ecs-cluster-using-terraform-g80
     security_groups = [
       aws_security_group.app.id,
-      aws_security_group.alb.id
     ]
   }
 
@@ -315,6 +359,7 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_security_group" "db" {
+  name   = "${var.project}-${var.environment}-db-sg"
   vpc_id = local.vpc_id
 
   ingress {
@@ -341,9 +386,10 @@ resource "aws_security_group" "db" {
 
 
 resource "aws_security_group" "app" {
+  name   = "${var.project}-${var.environment}-app-sg"
   vpc_id = local.vpc_id
 
-  // TODO(P1): Limit egress to app port and ssh
+  // TODO(P1): Limit ingress to app port and ssh
   ingress {
     from_port = 0
     to_port   = 0
@@ -353,7 +399,7 @@ resource "aws_security_group" "app" {
     security_groups = [aws_security_group.alb.id]
   }
 
-  // TODO(P1): Limit egress to db, email, and S3
+  // TODO(P1): Limit egress to db, email, efs, and S3
   egress {
     from_port        = 0
     to_port          = 0
@@ -369,6 +415,7 @@ resource "aws_security_group" "app" {
 }
 
 resource "aws_security_group" "alb" {
+  name   = "${var.project}-${var.environment}-alb-sg"
   vpc_id = local.vpc_id
 
   ingress {
@@ -406,6 +453,7 @@ resource "aws_security_group" "alb" {
 }
 
 // "If you're using Application Load Balancers, then cross-zone load balancing is always turned on."
+// We only run in one AZ, but use all public subnets anyway.
 resource "aws_alb" "this" {
   name                       = "${var.project}-${var.environment}-alb"
   internal                   = false
@@ -490,6 +538,8 @@ resource "aws_db_parameter_group" "this" {
   }
 }
 
+# An RDS subnet group has to have multiple AZs / subnets,
+# even though RDS itself is single-AZ
 resource "aws_db_subnet_group" "this" {
   name       = "${var.project}-${var.environment}-db-group"
   subnet_ids = data.aws_subnets.private.ids
@@ -510,12 +560,11 @@ resource "aws_db_instance" "this" {
   engine_version             = "14"
   auto_minor_version_upgrade = true
   skip_final_snapshot        = true
-  // TODO get this from created task attribute
-  availability_zone       = local.default_zone
-  multi_az                = false
-  backup_retention_period = 35
-  storage_encrypted       = true
-  parameter_group_name    = aws_db_parameter_group.this.name
+  availability_zone          = local.one_zone_az_name
+  multi_az                   = false
+  backup_retention_period    = 35
+  storage_encrypted          = true
+  parameter_group_name       = aws_db_parameter_group.this.name
   # TODO unfortunately I couldn't find a setting in AWS for changing
   # the cloudwatch log group for RDS. But ideally this would use the same
   # group as the server task (`project.environment`)
