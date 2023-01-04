@@ -60,7 +60,7 @@ jobs:
     needs: [check]
     if: needs.check.outputs.already-built == 'false'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     permissions:
       id-token: write
       contents: read
