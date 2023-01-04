@@ -43,11 +43,19 @@ resource "aws_efs_file_system_policy" "this" {
           "Action" : "*",
           "Condition" : {
             "Bool" : {
-              "aws:SecureTransport" : "true"
+              "aws:SecureTransport" : "false"
             }
           }
         }
       ]
     }
   )
+}
+
+resource "aws_efs_backup_policy" "this" {
+  file_system_id = aws_efs_file_system.this.id
+
+  backup_policy {
+    status = "ENABLED"
+  }
 }
