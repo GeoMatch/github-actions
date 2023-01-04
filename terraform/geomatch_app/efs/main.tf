@@ -28,7 +28,7 @@ resource "aws_efs_file_system" "this" {
 
 resource "aws_efs_file_system_policy" "this" {
   file_system_id                     = aws_efs_file_system.this.id
-  bypass_policy_lockout_safety_check = false
+  bypass_policy_lockout_safety_check = true
 
   # Deny any traffic that isn't secure by default
   policy = jsonencode(
