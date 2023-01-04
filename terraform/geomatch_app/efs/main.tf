@@ -40,6 +40,7 @@ resource "aws_efs_file_system_policy" "this" {
           "Principal" : {
             "AWS" : "*"
           },
+          "Resource" : aws_efs_file_system.this.arn,
           "Action" : "*",
           "Condition" : {
             "Bool" : {
