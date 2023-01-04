@@ -17,6 +17,7 @@ terraform {
 resource "aws_efs_file_system" "this" {
   encrypted              = true # TODO(P2): CMK
   availability_zone_name = var.networking_module.one_zone_az_name
+  creation_token         = "${var.project}-${var.environment}-efs"
   # TODO(P2): Document this decision
   throughput_mode = "elastic"
   tags = {
@@ -26,7 +27,7 @@ resource "aws_efs_file_system" "this" {
 }
 
 resource "aws_efs_file_system_policy" "this" {
-  file_system_id = aws_efs_file_system.this.id
+  file_system_id                     = aws_efs_file_system.this.id
   bypass_policy_lockout_safety_check = false
 
   # Deny any traffic that isn't secure by default
