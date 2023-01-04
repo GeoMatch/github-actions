@@ -182,7 +182,7 @@ resource "aws_iam_role" "github_action_terraform_plan" {
   name               = "${var.project}-${var.environment}-github-action-terraform-plan-role"
   assume_role_policy = data.aws_iam_policy_document.github_actions.json
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess", "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"]
 
   tags = {
     Project     = var.project
