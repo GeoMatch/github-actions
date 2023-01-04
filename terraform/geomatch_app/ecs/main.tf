@@ -301,7 +301,7 @@ resource "aws_ecs_task_definition" "this" {
     name = local.app_efs_volume_name
     efs_volume_configuration {
       file_system_id    = var.efs_module.file_system_id
-      transitEncryption = "ENABLED"
+      transit_transit_encryption = "ENABLED"
       authorization_config {
         access_point_id = aws_efs_access_point.this.id
         iam             = "ENABLED"

@@ -44,8 +44,4 @@ resource "aws_efs_mount_target" "this" {
   # ECS task is in public subnet, but cross-subnet in one AZ is fine
   subnet_id       = var.networking_module.one_zone_private_subnet_id
   security_groups = [aws_security_group.efs.id]
-  tags = {
-    Project     = var.project
-    Environment = var.environment
-  }
 }
