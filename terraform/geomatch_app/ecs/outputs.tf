@@ -55,7 +55,7 @@ output "ecs_task_def_family" {
 }
 
 output "ecs_task_subnet" {
-  value = aws_ecs_service.this.network_configuration[0].subnets[0]
+  value = local.one_zone_public_subnet_id
 }
 
 output "ecs_task_security_group" {
