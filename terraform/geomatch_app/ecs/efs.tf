@@ -37,6 +37,10 @@ resource "aws_security_group" "efs" {
     Project     = var.project
     Environment = var.environment
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_efs_mount_target" "this" {

@@ -382,6 +382,10 @@ resource "aws_security_group" "db" {
     Project     = var.project
     Environment = var.environment
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 
@@ -411,6 +415,10 @@ resource "aws_security_group" "app" {
   tags = {
     Project     = var.project
     Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -449,6 +457,10 @@ resource "aws_security_group" "alb" {
   tags = {
     Project     = var.project
     Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
