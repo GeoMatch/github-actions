@@ -201,7 +201,8 @@ resource "aws_ecs_task_definition" "this" {
         "options" : {
           "awslogs-group" : aws_cloudwatch_log_group.app.name,
           "awslogs-region" : var.aws_region,
-          "awslogs-stream-prefix" : var.geomatch_version
+          "awslogs-stream-prefix" : var.geomatch_version,
+          "awslogs-datetime-format" : "\\[%Y-%m-%d %H:%M:%S%L\\]"
         }
       },
       "healthCheck" : {
@@ -300,7 +301,7 @@ resource "aws_ecs_task_definition" "this" {
   volume {
     name = local.app_efs_volume_name
     efs_volume_configuration {
-      file_system_id    = var.efs_module.file_system_id
+      file_system_id     = var.efs_module.file_system_id
       transit_encryption = "ENABLED"
       authorization_config {
         access_point_id = aws_efs_access_point.this.id
