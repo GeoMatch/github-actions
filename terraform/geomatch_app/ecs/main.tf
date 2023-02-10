@@ -474,6 +474,8 @@ resource "aws_alb" "this" {
   subnets                    = data.aws_subnets.public.ids
   security_groups            = [aws_security_group.alb.id]
   enable_deletion_protection = true
+  # TODO(P1): remove if polling
+  idle_timeout = 240
 
   # TODO access logs
 
