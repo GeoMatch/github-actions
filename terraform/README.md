@@ -1,19 +1,12 @@
-# TODO
-
-See if a github action for ECS deploy can verify what resources are in the plan
-and fail if there's unexpected ones.
-
-Output build args needed in github build from ecs module
-
-Seperate out networking
-
 # Overview
 
 `geomatch-central` - Manages resources that need to be reused across GeoMatch implementations (i.e. DNS).
 It is self contained and should be on a separate account. Resources from here needed by other modules should be
 accessed with data blocks instead of remote state.
 
-`geomatch-ecs` - Module that can be instantiated by each implementation to setup GeoMatch infrastructure.
+`geomatch-ecs` - Module that can be instantiated by each implementation to setup GeoMatch infrastructure:
+
+![GeoMatch-Hosted AWS](./GeoMatch-Hosted%20AWS%20Architecture.png)
 
 # Naming Conventions
 
@@ -97,3 +90,7 @@ The `ref` param will be the branch of this repo to pull.
 TODO
 
 - [ ] Setting up Github action to deploy with https://github.com/webfactory/ssh-agent
+- [ ] See if a github action for ECS deploy can verify what resources are in the plan
+and fail if there's unexpected ones.
+- [ ] Output build args needed in github build from ecs module
+- [ ] Seperate out networking
