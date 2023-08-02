@@ -10,12 +10,18 @@ on:
         required: true
         description: "GeoMatch version tag to build for (i.e. v0.0.1)."
         type: string
+      target:
+        required: false
+        description: "GeoMatch Dockerfile build target. If 'production', the version will be the tag instead of the target."
+        default: "production"
+        type: string
 
 # TODO: gha Cache doesn't work for tags?
 # https://github.com/docker/build-push-action/issues/433
 
 env:
   GEOMATCH_VERSION: ${{ inputs.version }}
+  TAG: ${{ inputs.target == 'production' && inputs.version || inputs.target }}
   # Frustrating workaround becuase we can't use secrets as inputs.
   # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
   DOCKER_BUILD_ARGS: |
@@ -50,11 +56,11 @@ jobs:
           V=$( \
             aws ecr batch-get-image \
             --repository-name ${{ secrets.AWS_GEOMATCH_ECR_REPO_NAME }} \
-            --image-ids=imageTag=${{ inputs.version }} \
+            --image-ids=imageTag=${{ env.TAG }} \
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
           )
-          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
+          echo "::set-output name=built::$([[ $V == ${{ env.TAG }} ]] && echo true || echo false)"
   build:
     name: "Build / Push Container"
     needs: [check]
@@ -86,18 +92,18 @@ jobs:
       # TODO: Change back to setup of commit 314fea7adcc6a6bccc41cf86ba98203a3d383d9b
       # once https://github.com/aws/containers-roadmap/issues/876 is resolved.
       # Also gha cache has 7 day expiry fyi
-      - name: Build 'production' image
-        id: docker_build_production
+      - name: "Build '${{ inputs.target }}' image"
+        id: docker_build
         uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
           tags: |
-            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ env.TAG }}"
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
-          target: production
+          target: ${{ inputs.target }}
           push: true
           load: false
-          cache-from: "type=gha,scope=prod"
-          cache-to: "type=gha,scope=prod,mode=max"
+          cache-from: "type=gha,scope=${{ inputs.target }}"
+          cache-to: "type=gha,scope=${{ inputs.target }},mode=max"
