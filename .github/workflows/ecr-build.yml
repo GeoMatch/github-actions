@@ -59,7 +59,7 @@ jobs:
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
           )
-          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
+          echo "built=$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)" >> $GITHUB_OUTPUT
   build:
     name: "Build / Push Container"
     needs: [check]

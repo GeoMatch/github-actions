@@ -54,7 +54,7 @@ jobs:
           SUPER=$([[ 'true' == ${{ inputs.superuser }} ]] && echo "--superuser" || echo "")
           OUT=$(echo "python manage.py newuser ${{ inputs.email }} ${{ steps.pass.outputs.value }} ${{ inputs.extra-args }} $STAFF $SUPER")
           echo "::add-mask::$OUT"
-          echo "::set-output name=command::$OUT"
+          echo "command=$OUT" >> $GITHUB_OUTPUT
       - name: Run command on ECS
         uses: GeoMatch/deployment/.github/actions/ecs-run-sync@main
         with:
