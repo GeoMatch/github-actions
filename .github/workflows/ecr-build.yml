@@ -12,7 +12,7 @@ on:
         type: string
       target:
         required: false
-        description: "GeoMatch Dockerfile build target. If 'production', the version will be the tag instead of the target."
+        description: "GeoMatch Dockerfile build target. If 'production', the latest tag will be used as well."
         default: "production"
         type: string
 
@@ -21,7 +21,6 @@ on:
 
 env:
   GEOMATCH_VERSION: ${{ inputs.version }}
-  TAG: ${{ inputs.target == 'production' && inputs.version || inputs.target }}
   # Frustrating workaround becuase we can't use secrets as inputs.
   # See https://stackoverflow.com/questions/73606841/github-actions-passing-secret-as-input-for-reusable-workflow
   DOCKER_BUILD_ARGS: |
@@ -56,11 +55,11 @@ jobs:
           V=$( \
             aws ecr batch-get-image \
             --repository-name ${{ secrets.AWS_GEOMATCH_ECR_REPO_NAME }} \
-            --image-ids=imageTag=${{ env.TAG }} \
+            --image-ids=imageTag=${{ inputs.version }} \
             --query 'images[].imageId.imageTag' \
             --output text | tr -d '[:space:]' \
           )
-          echo "::set-output name=built::$([[ $V == ${{ env.TAG }} ]] && echo true || echo false)"
+          echo "::set-output name=built::$([[ $V == ${{ inputs.version }} ]] && echo true || echo false)"
   build:
     name: "Build / Push Container"
     needs: [check]
@@ -100,8 +99,8 @@ jobs:
           file: Dockerfile
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
           tags: |
-            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ env.TAG }}"
-            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:latest"
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target == 'production' && 'latest' || 'null' }}"
           target: ${{ inputs.target }}
           push: true
           load: false
