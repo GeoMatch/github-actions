@@ -42,7 +42,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    if: inputs.skip_check != true
     outputs:
       already-built: ${{ steps.check.outputs.built }}
     steps:
