@@ -105,9 +105,13 @@ jobs:
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
-            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target == 'production' && 'latest' || 'null' }}"
+            ${{ inputs.target == 'production' && format('{0}:latest', secrets.AWS_GEOMATCH_ECR_REPO_URL) || '' }}
           target: ${{ inputs.target }}
+          # output=type=registry
+          # Not sure if cache-to a tagged image (see below) requires this or not,
+          # so just kept it in
           push: true
+          # NOT output=type=docker
           load: false
-          cache-from: "type=gha,scope=${{ inputs.target }}"
-          cache-to: "type=gha,scope=${{ inputs.target }},mode=max"
+          cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}-cache"
+          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}-cache"
