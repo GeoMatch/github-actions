@@ -53,6 +53,16 @@ variable "ecr_module" {
   })
 }
 
+variable "ses_module" {
+  sensitive = true
+  type = object({
+    smtp_host          = string
+    smtp_host_user     = string
+    smtp_host_password = string
+    sender_domain      = string
+  })
+}
+
 variable "efs_module" {
   sensitive = true
   type = object({

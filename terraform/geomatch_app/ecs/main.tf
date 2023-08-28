@@ -238,6 +238,22 @@ resource "aws_ecs_task_definition" "this" {
           "name" : "EFS_DIR",
           "value" : local.app_efs_container_path
         },
+        {
+          "name" : "EMAIL_SENDER_DOMAIN",
+          "value" : var.ses_module.sender_domain
+        },
+        {
+          "name" : "EMAIL_HOST",
+          "value" : var.ses_module.smtp_host
+        },
+        {
+          "name" : "EMAIL_HOST_USER",
+          "value" : var.ses_module.smtp_host_user
+        },
+        {
+          "name" : "EMAIL_HOST_PASSWORD",
+          "value" : var.ses_module.smtp_host_password
+        },
       ],
       "secrets" : [
         {
@@ -271,18 +287,6 @@ resource "aws_ecs_task_definition" "this" {
         {
           "name" : "ERROR_EMAIL",
           "valueFrom" : data.aws_ssm_parameter.django_error_email.arn
-        },
-        {
-          "name" : "EMAIL_HOST",
-          "valueFrom" : data.aws_ssm_parameter.django_email_host.arn
-        },
-        {
-          "name" : "EMAIL_HOST_USER",
-          "valueFrom" : data.aws_ssm_parameter.django_email_host_user.arn
-        },
-        {
-          "name" : "EMAIL_HOST_PASSWORD",
-          "valueFrom" : data.aws_ssm_parameter.django_email_host_password.arn
         },
       ],
       # The below are specified because otherwise AWS will silently write these
