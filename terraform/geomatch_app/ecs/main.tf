@@ -271,10 +271,11 @@ resource "aws_ecs_task_definition" "this" {
         },
         # Passed to GitHub secrets and to the app container so both
         # can run ECS tasks.
-        {
-          "name" : "ECS_RUN_CONFIG",
-          "valueFrom" : aws_ssm_parameter.ecs_run_task_config.arn
-        },
+        # TODO: this causes a cycle
+        # {
+        #   "name" : "ECS_RUN_CONFIG",
+        #   "valueFrom" : aws_ssm_parameter.ecs_run_task_config.arn
+        # },
         {
           "name" : "RUN_R_REMOTELY",
           "value" : data.aws_ssm_parameter.run_r_remotely.arn
