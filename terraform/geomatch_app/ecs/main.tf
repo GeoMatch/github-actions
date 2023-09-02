@@ -70,25 +70,13 @@ resource "aws_iam_role" "ecs_task" {
   }
 
   inline_policy {
-    name = "efs_policy"
-    policy = jsonencode({
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "elasticfilesystem:ClientMount",
-            "elasticfilesystem:ClientWrite"
-          ],
-          "Resource" : var.efs_module.file_system_arn,
-          "Condition" : {
-            "StringEquals" : {
-              "elasticfilesystem:AccessPointArn" : aws_efs_access_point.this.arn
-            }
-          }
-        }
-      ]
-    })
+    name   = "efs_policy"
+    policy = local.efs_access_policy
+  }
+
+  inline_policy {
+    name   = "lambda_policy"
+    policy = local.lambda_access_policy
   }
   tags = {
     Project     = var.project
@@ -172,12 +160,13 @@ locals {
   container_name         = "${var.project}-${var.environment}-app-container"
   task_definition_family = "${var.project}-${var.environment}-app-task-def"
   // Default AZ for the db and app. AWS may change AZ if default goes down.
-  one_zone_az_name          = var.networking_module.one_zone_az_name
-  one_zone_public_subnet_id = var.networking_module.one_zone_public_subnet_id
-  container_port            = tostring(var.ecr_module.geomatch_app_container_port)
-  container_port_num        = tonumber(local.container_port)
-  app_efs_volume_name       = "${var.project}-${var.environment}-efs-volume"
-  app_efs_container_path    = "/data/efs" # in container
+  one_zone_az_name             = var.networking_module.one_zone_az_name
+  one_zone_public_subnet_id    = var.networking_module.one_zone_public_subnet_id
+  container_port               = tostring(var.ecr_module.geomatch_app_container_port)
+  container_port_num           = tonumber(local.container_port)
+  app_efs_volume_name          = "${var.project}-${var.environment}-efs-volume"
+  app_efs_container_mount_path = "/data/efs" # in container
+  gm_container_url             = "${var.ecr_module.geomatch_app_ecr_repo_url}:${var.geomatch_version}"
 }
 
 resource "aws_ecs_task_definition" "this" {
@@ -185,7 +174,7 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions = jsonencode([
     {
       "name" : local.container_name,
-      "image" : "${var.ecr_module.geomatch_app_ecr_repo_url}:${var.geomatch_version}",
+      "image" : local.gm_container_url
       "essential" : true,
       # TODO consider limiting DNS to AWS if only network ability
       # needed is S3
@@ -236,7 +225,11 @@ resource "aws_ecs_task_definition" "this" {
         },
         {
           "name" : "EFS_DIR",
-          "value" : local.app_efs_container_path
+          "value" : local.app_efs_container_mount_path
+        },
+        {
+          "name" : "R_LAMBDA_NAME",
+          "value" : local.r_lambda_name
         },
         {
           "name" : "EMAIL_SENDER_DOMAIN",
@@ -276,6 +269,16 @@ resource "aws_ecs_task_definition" "this" {
           "name" : "APP_HOSTS",
           "valueFrom" : data.aws_ssm_parameter.django_app_hosts.arn
         },
+        # Passed to GitHub secrets and to the app container so both
+        # can run ECS tasks.
+        {
+          "name" : "ECS_RUN_CONFIG",
+          "valueFrom" : aws_ssm_parameter.ecs_run_task_config.arn
+        },
+        {
+          "name" : "RUN_R_REMOTELY",
+          "value" : data.aws_ssm_parameter.run_r_remotely.arn
+        },
         {
           "name" : "DJANGO_SECRET_KEY",
           "valueFrom" : data.aws_ssm_parameter.django_secret_key.arn
@@ -296,7 +299,7 @@ resource "aws_ecs_task_definition" "this" {
       "mountPoints" : [
         {
           "sourceVolume" : local.app_efs_volume_name,
-          "containerPath" : local.app_efs_container_path,
+          "containerPath" : local.app_efs_container_mount_path,
           "readOnly" : false
         }
       ]

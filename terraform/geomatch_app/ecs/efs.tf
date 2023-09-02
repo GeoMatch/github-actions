@@ -1,3 +1,26 @@
+locals {
+  # ECS task is in public subnet, but cross-subnet in one AZ is fine
+  efs_mount_target_subnet_id = var.networking_module.one_zone_private_subnet_id
+  efs_access_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite"
+        ],
+        "Resource" : var.efs_module.file_system_arn,
+        "Condition" : {
+          "StringEquals" : {
+            "elasticfilesystem:AccessPointArn" : aws_efs_access_point.this.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
 # See the following for a discussion of access point permissioning:
 # https://aws.amazon.com/blogs/containers/developers-guide-to-using-amazon-efs-with-amazon-ecs-and-aws-fargate-part-2/
 resource "aws_efs_access_point" "this" {
@@ -30,7 +53,7 @@ resource "aws_security_group" "efs" {
     from_port       = 2049
     to_port         = 2049
     cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.app.id]
+    security_groups = [aws_security_group.app.id, aws_security_group.r_lambda.id]
   }
 
   tags = {
@@ -45,7 +68,6 @@ resource "aws_security_group" "efs" {
 
 resource "aws_efs_mount_target" "this" {
   file_system_id = var.efs_module.file_system_id
-  # ECS task is in public subnet, but cross-subnet in one AZ is fine
-  subnet_id       = var.networking_module.one_zone_private_subnet_id
+  subnet_id       = local.efs_mount_target_subnet_id
   security_groups = [aws_security_group.efs.id]
 }
