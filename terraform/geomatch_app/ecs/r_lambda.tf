@@ -43,6 +43,7 @@ resource "aws_lambda_function" "r_lambda" {
   image_uri     = local.gm_container_url
   package_type  = "Image"
   timeout       = 60 * 4
+  memory_size   = 1024 * 9
 
   image_config {
     command = ["api.core.aws_lambda.r"]
@@ -99,6 +100,10 @@ resource "aws_iam_role" "r_lambda_exec" {
     name   = "efs_policy"
     policy = local.efs_access_policy
   }
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  ]
 
   tags = {
     Project     = var.project
