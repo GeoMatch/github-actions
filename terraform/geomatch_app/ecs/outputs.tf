@@ -73,3 +73,7 @@ output "app_error_email" {
 output "app_container_name" {
   value = local.container_name
 }
+
+output "r_lambda_arn" {
+  value = aws_lambda_function.r_lambda.arn
+}
