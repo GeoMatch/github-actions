@@ -263,6 +263,25 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
           var.ecs_module.ecs_task_iam_arn,
           var.ecs_module.ecs_task_execution_iam_arn,
         ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:ListFunctions"
+        ]
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:GetFunction",
+          "lambda:UpdateFunctionCode",
+          "lambda:UpdateFunctionConfiguration",
+          "lambda:PublishVersion",
+        ],
+        "Resource" : [
+          var.ecs_module.r_lambda_arn
+        ]
       }
     ]
   })

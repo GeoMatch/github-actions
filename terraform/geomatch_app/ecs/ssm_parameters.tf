@@ -406,3 +406,33 @@ data "aws_ssm_parameter" "django_email_host_password" {
     aws_ssm_parameter.django_email_host_password
   ]
 }
+
+locals {
+  ssm_name_run_r_remotely = "${var.ssm_name_prefix}/RUN_R_REMOTELY"
+}
+
+resource "aws_ssm_parameter" "run_r_remotely" {
+  name        = local.ssm_name_run_r_remotely
+  type        = "String"
+  value       = "False"
+  description = "Whether to run R remotely or locally. If True, R will be run on the R Lambda. If False, R will be run on the Django app."
+  overwrite   = false
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
+}
+
+data "aws_ssm_parameter" "run_r_remotely" {
+  name = local.ssm_name_run_r_remotely
+  depends_on = [
+    aws_ssm_parameter.run_r_remotely
+  ]
+}
