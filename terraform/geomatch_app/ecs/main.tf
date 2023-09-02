@@ -278,7 +278,7 @@ resource "aws_ecs_task_definition" "this" {
         # },
         {
           "name" : "RUN_R_REMOTELY",
-          "value" : data.aws_ssm_parameter.run_r_remotely.arn
+          "valueFrom" : data.aws_ssm_parameter.run_r_remotely.arn
         },
         {
           "name" : "DJANGO_SECRET_KEY",
