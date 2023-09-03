@@ -42,7 +42,7 @@ resource "aws_lambda_function" "r_lambda" {
   role          = aws_iam_role.r_lambda_exec.arn
   image_uri     = local.gm_container_url
   package_type  = "Image"
-  timeout       = 60 * 5
+  timeout       = 60 * 8
   memory_size   = 1024 * 9
 
   image_config {
