@@ -102,6 +102,31 @@ resource "aws_iam_role" "r_lambda_exec" {
     policy = local.efs_access_policy
   }
 
+  inline_policy {
+    name = "cloudwatch"
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          "Effect" : "Allow",
+          "Action" : "logs:CreateLogGroup",
+          "Resource" : "arn:aws:logs:region:${data.aws_caller_identity.current.account_id}:*"
+        },
+
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : [
+            "arn:aws:logs:region:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.r_lambda_name}:*"
+          ]
+        }
+      ]
+    })
+  }
+
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
   ]
