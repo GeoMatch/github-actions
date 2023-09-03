@@ -146,7 +146,6 @@ resource "aws_iam_role" "github_action_ecs_run_task" {
           "Resource" : [
             var.ecs_module.ecs_task_iam_arn,
             var.ecs_module.ecs_task_execution_iam_arn,
-            var.ecs_module.lambda_exec_iam_arn,
           ]
         },
         {
@@ -263,6 +262,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Resource" : [
           var.ecs_module.ecs_task_iam_arn,
           var.ecs_module.ecs_task_execution_iam_arn,
+          var.ecs_module.lambda_exec_iam_arn,
         ]
       },
       {
