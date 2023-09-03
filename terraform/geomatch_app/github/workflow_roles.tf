@@ -283,7 +283,19 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Resource" : [
           var.ecs_module.r_lambda_arn
         ]
-      }
+      },
+      {
+        # These are needed for lambda to deploy
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
     ]
   })
 }
