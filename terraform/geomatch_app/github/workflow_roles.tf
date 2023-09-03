@@ -275,10 +275,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "lambda:GetFunction",
-          "lambda:UpdateFunctionCode",
-          "lambda:UpdateFunctionConfiguration",
-          "lambda:PublishVersion",
+          "lambda:*",
         ],
         "Resource" : [
           var.ecs_module.r_lambda_arn
@@ -295,6 +292,18 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Resource" : [
           "*"
         ]
+      },
+      {
+        # For Lambda
+        "Action" : [
+          "ecr:SetRepositoryPolicy",
+          "ecr:GetRepositoryPolicy",
+          "ecr:InitiateLayerUpload"
+        ],
+        "Resource" : [
+          var.ecr_module.geomatch_app_ecr_repo_arn
+        ]
+        "Effect" : "Allow"
       },
     ]
   })

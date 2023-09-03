@@ -46,7 +46,7 @@ resource "aws_lambda_function" "r_lambda" {
   memory_size   = 1024 * 9
 
   image_config {
-    command = ["api.core.aws_lambda.r"]
+    command = ["api.core.aws_lambda.r.lambda_handler"]
   }
 
   file_system_config {
@@ -110,3 +110,26 @@ resource "aws_iam_role" "r_lambda_exec" {
     Environment = var.environment
   }
 }
+
+# AWS added this automatically, but may have to add it in the future
+#
+# resource "aws_ecr_repository_policy" "my_repository_policy" {
+#   repository = aws_ecr_repository.my_repository.name
+
+#   policy = jsonencode({
+#     Version = "2008-10-17"
+#     Statement = [
+#       {
+#         Sid    = "LambdaECRImageRetrievalPolicy"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "lambda.amazonaws.com"
+#         }
+#         Action = [
+#           "ecr:BatchCheckLayerAvailability",
+#           "ecr:GetDownloadUrlForLayer",
+#         ]
+#       }
+#     ]
+#   })
+# }
