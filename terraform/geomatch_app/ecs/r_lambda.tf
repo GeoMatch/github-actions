@@ -110,7 +110,7 @@ resource "aws_iam_role" "r_lambda_exec" {
         {
           "Effect" : "Allow",
           "Action" : "logs:CreateLogGroup",
-          "Resource" : "arn:aws:logs:region:${data.aws_caller_identity.current.account_id}:*"
+          "Resource" : "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
         },
 
         {
@@ -120,7 +120,7 @@ resource "aws_iam_role" "r_lambda_exec" {
             "logs:PutLogEvents"
           ],
           "Resource" : [
-            "arn:aws:logs:region:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.r_lambda_name}:*"
+            "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.r_lambda_name}:*"
           ]
         }
       ]
