@@ -77,3 +77,7 @@ output "app_container_name" {
 output "r_lambda_arn" {
   value = aws_lambda_function.r_lambda.arn
 }
+
+output "lambda_exec_iam_arn" {
+  value = aws_iam_role.r_lambda_exec.arn
+}

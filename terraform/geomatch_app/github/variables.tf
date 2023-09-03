@@ -46,6 +46,7 @@ variable "ecs_module" {
     app_container_name           = string
     ssm_geomatch_version_ecs_arn = string
     r_lambda_arn                 = string
+    lambda_exec_iam_arn          = string
   })
   default = null
 }
