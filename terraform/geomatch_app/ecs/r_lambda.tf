@@ -59,9 +59,10 @@ resource "aws_lambda_function" "r_lambda" {
     # However, the app mount was prefixed with /data/
     # before I knew lambda required mounts to start with /mnt/
     variables = {
-      LAMBDA_EFS_DIR   = local.lambda_efs_mount_path
-      APP_EFS_DIR      = local.app_efs_container_mount_path
-      GEOMATCH_VERSION = var.geomatch_version
+      LAMBDA_EFS_DIR     = local.lambda_efs_mount_path
+      APP_EFS_DIR        = local.app_efs_container_mount_path
+      GEOMATCH_VERSION   = var.geomatch_version
+      RENV_PATHS_LIBRARY = "renv/library"
     }
   }
 
