@@ -63,6 +63,7 @@ resource "aws_lambda_function" "r_lambda" {
       APP_EFS_DIR        = local.app_efs_container_mount_path
       GEOMATCH_VERSION   = var.geomatch_version
       RENV_PATHS_LIBRARY = "renv/library"
+      RENV_PATHS_ROOT    = local.lambda_efs_mount_path + ".cache/R/renv"
     }
   }
 
