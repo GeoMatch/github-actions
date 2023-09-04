@@ -63,10 +63,11 @@ resource "aws_lambda_function" "r_lambda" {
       APP_EFS_DIR        = local.app_efs_container_mount_path
       GEOMATCH_VERSION   = var.geomatch_version
       RENV_PATHS_LIBRARY = "renv/library"
-      # Lambda home dir isn't writable
-      RENV_PATHS_ROOT    = "${local.lambda_efs_mount_path}/.cache/R/renv"
-      RENV_PATHS_SANDBOX    = "${local.lambda_efs_mount_path}/.cache/R/renv/sandbox"
-    }
+      # Lambda home dir isn't writable.
+      # Fix: turned off cache entirely
+      # RENV_PATHS_ROOT    = "${local.lambda_efs_mount_path}/.cache/R/renv"
+      # RENV_PATHS_SANDBOX = "${local.lambda_efs_mount_path}/.cache/R/renv/sandbox"
+       }
   }
 
   vpc_config {
