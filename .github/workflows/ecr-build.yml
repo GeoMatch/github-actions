@@ -105,6 +105,7 @@ jobs:
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}"
             ${{ inputs.target == 'production' && format('{0}:latest', secrets.AWS_GEOMATCH_ECR_REPO_URL) || '' }}
           target: ${{ inputs.target }}
           # output=type=registry
