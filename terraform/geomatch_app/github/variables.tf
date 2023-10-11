@@ -65,3 +65,13 @@ variable "docker_build_args" {
   description = "Extra build args to pass to 'docker build'."
   default     = []
 }
+
+variable "extra_secrets" {
+  description = "List of extra GitHub Action Secrets to include"
+  sensitive = true
+  type = list(object({
+    name  = string
+    value = string
+  }))
+  default = []
+}

@@ -116,3 +116,10 @@ resource "github_actions_secret" "geomatch_task_subnet" {
   repository      = local.repo_name
   secret_name     = "AWS_GEOMATCH_TASK_SUBNET"
 }
+
+resource "github_actions_secret" "action_secrets" {
+  for_each        = { for secret in var.extra_secrets : secret.name => secret }
+  repository      = local.repo_name
+  secret_name     = each.value.name
+  plaintext_value = nonsensitive(each.value.value)
+}
