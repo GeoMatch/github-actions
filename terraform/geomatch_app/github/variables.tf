@@ -67,8 +67,8 @@ variable "docker_build_args" {
 }
 
 variable "extra_secrets" {
+  # TODO: make sensitive?
   description = "List of extra GitHub Action Secrets to include"
-  sensitive = true
   type = list(object({
     name  = string
     value = string
