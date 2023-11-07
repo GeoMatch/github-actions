@@ -485,7 +485,7 @@ resource "aws_alb" "this" {
   # TODO(P1): remove if polling
   idle_timeout = 240
 
-  # TODO access logs
+  # TODO access logs (although Django already collects this)
 
   tags = {
     Project     = var.project
@@ -522,7 +522,7 @@ resource "aws_lb_listener" "https" {
   protocol          = "HTTPS"
   // TODO Make this default to subdomain.geomatch.org cert in ssl.tf
   certificate_arn = data.aws_acm_certificate.this.arn
-  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type             = "forward"
