@@ -436,3 +436,33 @@ data "aws_ssm_parameter" "run_r_remotely" {
     aws_ssm_parameter.run_r_remotely
   ]
 }
+
+locals {
+  ssm_name_github_action_token = "${var.ssm_name_prefix}/GITHUB_ACTION_TOKEN"
+}
+
+resource "aws_ssm_parameter" "github_action_token" {
+  name        = local.ssm_name_github_action_token
+  type        = "String"
+  value       = "False"
+  description = "Github PAT for running Github Actions."
+  overwrite   = false
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
+}
+
+data "aws_ssm_parameter" "github_action_token" {
+  name = local.ssm_name_github_action_token
+  depends_on = [
+    aws_ssm_parameter.github_action_token
+  ]
+}

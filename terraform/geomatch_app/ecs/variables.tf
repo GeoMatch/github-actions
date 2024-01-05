@@ -21,6 +21,11 @@ variable "environment" {
   }
 }
 
+variable "github_geomatch_app_repo" {
+  type        = string
+  description = "e.g. org_name/repo_name"
+}
+
 variable "geomatch_subdomain" {
   description = "e.g. 'swiss' will become 'swiss.geomatch.org'"
   type        = string

@@ -46,7 +46,7 @@ resource "aws_lambda_function" "r_lambda" {
   memory_size   = 1024 * 9
 
   image_config {
-    command = ["python", "-m", "awslambdaric", "api.core.aws_lambda.r.lambda_handler"]
+    command = ["python", "-m", "awslambdaric", "api.core.py_r_interop.entry.lambda_handler"]
   }
 
   file_system_config {

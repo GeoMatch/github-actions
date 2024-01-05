@@ -220,6 +220,10 @@ resource "aws_ecs_task_definition" "this" {
           "value" : var.geomatch_version
         },
         {
+          "name" : "GEOMATCH_GITHUB_REPO",
+          "value" : var.github_geomatch_app_repo
+        },
+        {
           "name" : "CONTAINER_PORT",
           "value" : local.container_port
         },
@@ -249,6 +253,10 @@ resource "aws_ecs_task_definition" "this" {
         },
       ],
       "secrets" : [
+        {
+          "name" : "GITHUB_ACTION_TOKEN",
+          "valueFrom" : data.aws_ssm_parameter.github_action_token.arn
+        },
         {
           "name" : "GEOMATCH_DATABASE_PASSWORD",
           "valueFrom" : data.aws_ssm_parameter.db_password.arn
