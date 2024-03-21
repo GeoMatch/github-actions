@@ -37,17 +37,40 @@ resource "aws_security_group" "r_lambda" {
   }
 }
 
+data "archive_file" "lambda" {
+  type        = "zip"
+  output_path = "${path.module}/lambda_function.zip"
+
+  source {
+    content  = <<EOF
+import json
+
+def lambda_handler(event, context):
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
+EOF
+    filename = "lambda_function.py"
+  }
+}
+
 resource "aws_lambda_function" "r_lambda" {
   function_name = local.r_lambda_name
   role          = aws_iam_role.r_lambda_exec.arn
-  image_uri     = local.gm_container_url
-  package_type  = "Image"
+  # image_uri     = local.gm_container_url
+  # package_type  = "Image"
   timeout       = 60 * 8
   memory_size   = 1024 * 9
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.8"
 
-  image_config {
-    command = ["python", "-m", "awslambdaric", "api.core.py_r_interop.entry.lambda_handler"]
-  }
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+  filename         = data.archive_file.lambda.output_path
+
+  # image_config {
+  #   command = ["python", "-m", "awslambdaric", "api.core.py_r_interop.entry.lambda_handler"]
+  # }
 
   file_system_config {
     arn              = aws_efs_access_point.this.arn
@@ -67,7 +90,7 @@ resource "aws_lambda_function" "r_lambda" {
       # Fix: turned off cache entirely
       # RENV_PATHS_ROOT    = "${local.lambda_efs_mount_path}/.cache/R/renv"
       # RENV_PATHS_SANDBOX = "${local.lambda_efs_mount_path}/.cache/R/renv/sandbox"
-       }
+    }
   }
 
   vpc_config {
