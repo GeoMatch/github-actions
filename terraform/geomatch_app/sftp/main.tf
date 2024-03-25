@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.10"
+      version = "~> 5.42"
     }
   }
 
@@ -44,6 +44,10 @@ resource "aws_eip" "this" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "sftp_server" {
+  name_prefix = "${var.project}-sftp-"
+}
+
 resource "aws_transfer_server" "this" {
   # Might need force_destroy = true for deleting (or add count to user)
   count                  = var.sftp_server_up ? 1 : 0
@@ -52,7 +56,10 @@ resource "aws_transfer_server" "this" {
   protocols              = ["SFTP"]
   domain                 = "S3"
   host_key               = data.aws_ssm_parameter.host_private_key.value
-  endpoint_type          = "VPC"
+  structured_log_destinations = [
+    "${aws_cloudwatch_log_group.sftp_server.arn}:*"
+  ]
+  endpoint_type = "VPC"
   # I think this creates a VPC endpoint automatically
   endpoint_details {
     vpc_id                 = var.networking_module.vpc_id
@@ -188,6 +195,8 @@ resource "aws_iam_role" "sftp_logging" {
       ]
     })
   }
+
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 
   tags = {
     Project = var.project
