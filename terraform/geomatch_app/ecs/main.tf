@@ -254,6 +254,10 @@ resource "aws_ecs_task_definition" "this" {
       ],
       "secrets" : [
         {
+          "name" : "BLS_API_KEY",
+          "valueFrom" : data.aws_ssm_parameter.bls_api_key.arn
+        },
+        {
           "name" : "GITHUB_ACTION_TOKEN",
           "valueFrom" : data.aws_ssm_parameter.github_action_token.arn
         },

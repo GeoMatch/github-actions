@@ -466,3 +466,33 @@ data "aws_ssm_parameter" "github_action_token" {
     aws_ssm_parameter.github_action_token
   ]
 }
+
+locals {
+  ssm_name_bls_api_key = "${var.ssm_name_prefix}/BLS_API_KEY"
+}
+
+resource "aws_ssm_parameter" "bls_api_key" {
+  name        = local.ssm_name_bls_api_key
+  type        = "String"
+  value       = ""
+  description = "BLS API key"
+  overwrite   = false
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
+}
+
+data "aws_ssm_parameter" "bls_api_key" {
+  name = local.ssm_name_bls_api_key
+  depends_on = [
+    aws_ssm_parameter.bls_api_key
+  ]
+}
