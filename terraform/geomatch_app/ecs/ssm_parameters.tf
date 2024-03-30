@@ -474,7 +474,7 @@ locals {
 resource "aws_ssm_parameter" "bls_api_key" {
   name        = local.ssm_name_bls_api_key
   type        = "String"
-  value       = ""
+  value       = "N/A"
   description = "BLS API key"
   overwrite   = false
 
