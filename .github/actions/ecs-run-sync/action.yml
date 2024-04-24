@@ -19,6 +19,12 @@ inputs:
       anything other than 'false' to use the shell-form
     required: false
     default: "false"
+  dont-wait:
+    description: >-
+      If set to anything other than 'false', this action will not wait for the
+      ECS task to stop. 
+    required: false
+    default: "false"
 outputs:
   task-arn:
     description: "The ECS's tasks ARN."

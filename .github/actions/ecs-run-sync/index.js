@@ -5,7 +5,7 @@ import {
   waitUntilTasksStopped,
 } from "@aws-sdk/client-ecs";
 
-const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
+const runTaskSync = async (runTaskConfig, cmd, useExecForm, dontWait) => {
   let command;
   if (useExecForm && cmd.startsWith("[") && cmd.endsWith("]")) {
     command = JSON.parse(cmd);
@@ -42,6 +42,11 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
   if (typeof taskArn !== "string") {
     throw Error("Task ARN is not defined.");
   }
+  // TODO(P1): Consider raising timeout instead of optional 
+  // This was mostly done to try debuggign the long reinti pipeline
+  if (dontWait) {
+    return taskArn;
+  }
   await waitUntilTasksStopped(
     { client: ecsClient, maxWaitTime: 600, maxDelay: 20, minDelay: 1 },
     { cluster: runTaskConfig.AWS_GEOMATCH_CLUSTER_ARN, tasks: [taskArn] }
@@ -55,7 +60,8 @@ const run = async () => {
     const taskArn = await runTaskSync(
       JSON.parse(config),
       core.getInput("command"),
-      core.getInput("shell-form") === "false"
+      core.getInput("shell-form") === "false",
+      core.getInput("dont-wait") !== "false"
     );
     core.setOutput("task-arn", taskArn);
   } catch (error) {
