@@ -16,13 +16,6 @@ on:
         required: false
         type: string
         default: "false"
-      dont-wait:
-        description: >-
-          (Async) If set to anything other than 'false', this action will not wait for the
-          ECS task to stop. 
-        required: false
-        type: string
-        default: "false"
 
 # TODO create user workflow that masks secret: https://github.com/actions/runner/issues/643
 
@@ -54,4 +47,3 @@ jobs:
           ecs-run-task-config: ${{ steps.config.outputs.value }}
           command: ${{ inputs.command }}
           shell-form: ${{ inputs.shell-form }}
-          dont-wait: ${{ inputs.dont-wait }}

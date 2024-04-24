@@ -194,13 +194,6 @@ resource "aws_ecs_task_definition" "this" {
           "awslogs-datetime-format" : "\\[%Y-%m-%d %H:%M:%S%L\\]"
         }
       },
-      "healthCheck" : {
-        "command" : ["CMD-SHELL", "curl -f http://localhost:${local.container_port}/health/ || exit 1"],
-        "retries" : 5,
-        "interval" : 60,
-        "startPeriod" : 3,
-        "timeout" : 5,
-      },
       # TODO(P2): Recieve extra env var as input using template
       "environment" : [
         {

@@ -5,7 +5,7 @@ import {
   waitUntilTasksStopped,
 } from "@aws-sdk/client-ecs";
 
-const runTaskSync = async (runTaskConfig, cmd, useExecForm, dontWait) => {
+const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
   let command;
   if (useExecForm && cmd.startsWith("[") && cmd.endsWith("]")) {
     command = JSON.parse(cmd);
@@ -26,6 +26,12 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm, dontWait) => {
         {
           name: runTaskConfig.AWS_GEOMATCH_ECS_CONTAINER_NAME,
           command: command,
+          environment: [
+            {
+              name: "SKIP_HEALTHCHECK",
+              value: "true",
+            },
+          ],
         },
       ],
     },
@@ -42,13 +48,8 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm, dontWait) => {
   if (typeof taskArn !== "string") {
     throw Error("Task ARN is not defined.");
   }
-  // TODO(P1): Consider raising timeout instead of optional 
-  // This was mostly done to try debuggign the long reinti pipeline
-  if (dontWait) {
-    return taskArn;
-  }
   await waitUntilTasksStopped(
-    { client: ecsClient, maxWaitTime: 600, maxDelay: 20, minDelay: 1 },
+    { client: ecsClient, maxWaitTime: 1200, maxDelay: 60, minDelay: 1 },
     { cluster: runTaskConfig.AWS_GEOMATCH_CLUSTER_ARN, tasks: [taskArn] }
   );
   return taskArn;
@@ -60,8 +61,7 @@ const run = async () => {
     const taskArn = await runTaskSync(
       JSON.parse(config),
       core.getInput("command"),
-      core.getInput("shell-form") === "false",
-      core.getInput("dont-wait") !== "false"
+      core.getInput("shell-form") === "false"
     );
     core.setOutput("task-arn", taskArn);
   } catch (error) {
