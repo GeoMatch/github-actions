@@ -26,8 +26,6 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
         {
           name: runTaskConfig.AWS_GEOMATCH_ECS_CONTAINER_NAME,
           command: command,
-          cpu: 2048,
-          memory: 6144,
           environment: [
             {
               name: "SKIP_HEALTHCHECK",
