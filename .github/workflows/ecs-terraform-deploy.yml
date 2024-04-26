@@ -5,6 +5,11 @@ on:
         required: true
         description: "GeoMatch version tag to build for (i.e. v0.0.1)."
         type: string
+      extra_vars:
+        required: false
+        description: "Extra variables to pass to Terraform. (i.e. --var)"
+        type: string
+        default: ""
 
 jobs:
   terraform-deploy:
@@ -32,7 +37,7 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=./prod.backend.auto.tfvars
       - name: Terraform Plan
-        run: terraform plan -var="geomatch_version=${{ inputs.version }}" -out prod.plan
+        run: terraform plan -var="geomatch_version=${{ inputs.version }}" ${{ inputs.extra_vars }} -out prod.plan
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

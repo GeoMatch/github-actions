@@ -5,6 +5,7 @@
 
 # We only store this in SSM for bookkeeping purposes.
 # Depend on the geomatch_version variable instead of this.
+# This may be incorrect if the ECS deploy fails.
 resource "aws_ssm_parameter" "geomatch_version_ecs" {
   name        = "${var.ssm_name_prefix}/ECS_GEOMATCH_VERSION"
   type        = "String"
