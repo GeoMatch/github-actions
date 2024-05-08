@@ -49,7 +49,7 @@ const runTaskSync = async (runTaskConfig, cmd, useExecForm) => {
     throw Error("Task ARN is not defined.");
   }
   await waitUntilTasksStopped(
-    { client: ecsClient, maxWaitTime: 3600, maxDelay: 60, minDelay: 1 },
+    { client: ecsClient, maxWaitTime: 60 * 60 * 2, maxDelay: 60 * 2, minDelay: 1 },
     { cluster: runTaskConfig.AWS_GEOMATCH_CLUSTER_ARN, tasks: [taskArn] }
   );
   return taskArn;
