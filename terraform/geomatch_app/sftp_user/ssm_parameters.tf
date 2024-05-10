@@ -18,8 +18,9 @@ resource "aws_ssm_parameter" "user_public_key" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
+    UserId      = var.user_id
   }
 }
 
@@ -44,8 +45,9 @@ resource "aws_ssm_parameter" "sftp_username" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
+    UserId      = var.user_id
   }
 }
 
