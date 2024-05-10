@@ -18,7 +18,8 @@ resource "aws_ssm_parameter" "host_private_key" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
   }
 }
 
@@ -43,7 +44,8 @@ resource "aws_ssm_parameter" "host_public_key" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
   }
 }
 
