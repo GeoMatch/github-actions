@@ -6,6 +6,12 @@ variable "environment" {
   type = string
 }
 
+variable "user_id" {
+  # Note: This is not the username, but an easy to read identifier for the user
+  # Used for resource naming / tagging
+  type = string
+}
+
 variable "aws_region" {
   type = string
 }

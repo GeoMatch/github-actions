@@ -14,7 +14,7 @@ locals {
 }
 
 resource "aws_iam_role" "sftp_user" {
-  name = "${var.project}-${var.environment}-sftp-user-role"
+  name = "${var.project}-${var.environment}-${var.user_id}-sftp-user-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -30,7 +30,7 @@ resource "aws_iam_role" "sftp_user" {
   })
 
   inline_policy {
-    name = "${var.project}-${var.environment}-sftp-user-policy"
+    name = "${var.project}-${var.environment}-${var.user_id}-sftp-user-policy"
     policy = jsonencode({
       "Version" : "2012-10-17",
       "Statement" : [
@@ -56,6 +56,7 @@ resource "aws_iam_role" "sftp_user" {
   tags = {
     Project     = var.project
     Environment = var.environment
+    UserId      = var.user_id
   }
 }
 
@@ -69,6 +70,7 @@ resource "aws_transfer_user" "this" {
   tags = {
     Project     = var.project
     Environment = var.environment
+    UserId      = var.user_id
   }
 }
 
@@ -80,11 +82,12 @@ resource "aws_transfer_ssh_key" "this" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.project}-${var.environment}-sftp"
+  bucket = "${var.project}-${var.environment}-${var.user_id}-sftp"
 
   tags = {
     Project     = var.project
     Environment = var.environment
+    UserId      = var.user_id
   }
 }
 

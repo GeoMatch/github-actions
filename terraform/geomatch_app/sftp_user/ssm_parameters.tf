@@ -1,5 +1,5 @@
 locals {
-  ssm_name_prefix          = "/${var.project}/${var.environment}"
+  ssm_name_prefix          = "/${var.project}/${var.environment}/${var.user_id}"
   ssm_name_user_public_key = "${local.ssm_name_prefix}/SFTP_USER_PUBLIC_KEY"
   ssm_name_username        = "${local.ssm_name_prefix}/SFTP_USERNAME"
 }
