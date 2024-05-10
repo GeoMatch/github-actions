@@ -7,7 +7,7 @@ locals {
 resource "aws_ssm_parameter" "user_public_key" {
   name        = local.ssm_name_user_public_key
   type        = "SecureString"
-  value       = "placeholder"
+  value       = var.public_key
   description = "AWS Transfer Family only accepts PEM formatted public keys. See https://docs.aws.amazon.com/transfer/latest/userguide/key-management.html#convert-ssh2-public-key"
   overwrite   = false
 
@@ -34,7 +34,7 @@ data "aws_ssm_parameter" "user_public_key" {
 resource "aws_ssm_parameter" "sftp_username" {
   name        = local.ssm_name_username
   type        = "SecureString"
-  value       = "prod-username"
+  value       = var.username
   description = ""
   overwrite   = false
 

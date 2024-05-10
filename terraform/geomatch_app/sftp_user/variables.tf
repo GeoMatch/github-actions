@@ -12,6 +12,18 @@ variable "user_id" {
   type = string
 }
 
+variable "username" {
+  type = string
+  # If not supplied, you must set via SSM and re-apply
+  default = "" 
+}
+
+variable "public_key" {
+  type = string
+  # If not supplied, you must set via SSM and re-apply
+  default = "" 
+}
+
 variable "aws_region" {
   type = string
 }
