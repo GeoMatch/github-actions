@@ -29,6 +29,7 @@ resource "aws_security_group" "this" {
     # SFTP tags are different because we resuse
     # resources across environments.
     Project = var.project
+    # TODO(refactor) here and eslewhere here
   }
 
   lifecycle {
@@ -73,54 +74,6 @@ resource "aws_transfer_server" "this" {
   }
 }
 
-
-resource "aws_iam_role" "sftp_staging_user" {
-  name = "${var.project}-staging-sftp-user-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "transfer.amazonaws.com"
-        }
-      }
-    ]
-  })
-
-  inline_policy {
-    name = "${var.project}-staging-sftp-user-policy"
-    policy = jsonencode({
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Action" : [
-            "s3:ListBucket"
-          ],
-          "Effect" : "Allow",
-          "Resource" : ["${aws_s3_bucket.sftp_staging.arn}"]
-        },
-        {
-          # s3:GetObject is not allowed
-          "Action" : [
-            "s3:PutObject", "s3:DeleteObject"
-          ],
-          "Effect" : "Allow",
-          "Resource" : ["${aws_s3_bucket.sftp_staging.arn}/*"]
-        },
-      ]
-    })
-  }
-
-  tags = {
-    Project     = var.project
-    Environment = "staging"
-  }
-}
-
-
 resource "aws_iam_role" "sftp_logging" {
   name = "${var.project}-sftp-logging-role"
 
@@ -155,57 +108,6 @@ resource "aws_iam_role" "sftp_logging" {
 
   tags = {
     Project = var.project
-  }
-}
-
-resource "aws_transfer_user" "sftp_staging" {
-  count          = var.sftp_server_up ? 1 : 0
-  server_id      = aws_transfer_server.this[0].id
-  role           = aws_iam_role.sftp_staging_user.arn
-  user_name      = data.aws_ssm_parameter.staging_sftp_username.value
-  home_directory = "/${aws_s3_bucket.sftp_staging.bucket}"
-
-  tags = {
-    Project     = var.project
-    Environment = "staging"
-  }
-}
-
-resource "aws_transfer_ssh_key" "sftp_staging" {
-  count     = var.sftp_server_up ? 1 : 0
-  server_id = aws_transfer_server.this[0].id
-  user_name = aws_transfer_user.sftp_staging[0].user_name
-  body      = data.aws_ssm_parameter.staging_user_public_key.value
-}
-
-resource "aws_s3_bucket" "sftp_staging" {
-  bucket = "${var.project}-staging-sftp"
-
-  tags = {
-    Project     = var.project
-    Environment = "staging"
-  }
-}
-
-resource "aws_s3_bucket_ownership_controls" "sftp_staging" {
-  bucket = aws_s3_bucket.sftp_staging.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_acl" "stfp_staging" {
-  bucket = aws_s3_bucket.sftp_staging.id
-  acl    = "private"
-
-  depends_on = [aws_s3_bucket_ownership_controls.sftp_staging]
-}
-
-resource "aws_s3_bucket_versioning" "sftp_staging" {
-  bucket = aws_s3_bucket.sftp_staging.id
-
-  versioning_configuration {
-    status = "Enabled"
   }
 }
 
