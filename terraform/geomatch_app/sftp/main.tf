@@ -70,12 +70,13 @@ resource "aws_transfer_server" "this" {
     address_allocation_ids = [aws_eip.this.id]
   }
 
-  workflow_details {
-    on_upload {
-      execution_role = aws_iam_role.transfer_workflow.arn
-      workflow_id    = aws_transfer_workflow.post_upload.id
-    }
-  }
+  # TODO(#10): Add lambda to write to EFS 
+  # workflow_details {
+    # on_upload {
+    #   execution_role = aws_iam_role.transfer_workflow.arn
+    #   workflow_id    = aws_transfer_workflow.post_upload.id
+    # }
+  # }
 
   tags = {
     Project     = var.project
