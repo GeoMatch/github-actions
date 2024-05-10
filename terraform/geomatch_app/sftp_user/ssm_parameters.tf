@@ -1,8 +1,7 @@
 locals {
-  ssm_name_prefix                  = "/${var.project}"
-  # TODO(refactor)
-  ssm_name_user_public_key    = "${local.ssm_name_prefix}/SFTP_${upper(var.environment)}_USER_PUBLIC_KEY"
-  ssm_name_username           = "${local.ssm_name_prefix}/SFTP_${upper(var.environment)}_USERNAME"
+  ssm_name_prefix          = "/${var.project}/${var.environment}"
+  ssm_name_user_public_key = "${local.ssm_name_prefix}/SFTP_USER_PUBLIC_KEY"
+  ssm_name_username        = "${local.ssm_name_prefix}/SFTP_USERNAME"
 }
 
 resource "aws_ssm_parameter" "user_public_key" {
@@ -19,8 +18,8 @@ resource "aws_ssm_parameter" "user_public_key" {
   }
 
   tags = {
-    # TODO(refactor): Add environment
     Project = var.project
+    Environment = var.environment
   }
 }
 
@@ -45,8 +44,8 @@ resource "aws_ssm_parameter" "sftp_username" {
   }
 
   tags = {
-    # TODO(refactor): Add environment
     Project = var.project
+    Environment = var.environment
   }
 }
 

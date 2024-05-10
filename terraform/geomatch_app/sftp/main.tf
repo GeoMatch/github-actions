@@ -14,7 +14,7 @@ locals {
 }
 
 resource "aws_security_group" "this" {
-  name   = "${var.project}-sftp-sg"
+  name   = "${var.project}-${var.environment}-sftp-sg"
   vpc_id = local.vpc_id
 
   ingress {
@@ -29,7 +29,7 @@ resource "aws_security_group" "this" {
     # SFTP tags are different because we resuse
     # resources across environments.
     Project = var.project
-    # TODO(refactor) here and eslewhere here
+    Environment = var.environment
   }
 
   lifecycle {
@@ -42,11 +42,12 @@ resource "aws_eip" "this" {
   # with our account.
   tags = {
     Project = var.project
+    Environment = var.environment
   }
 }
 
 resource "aws_cloudwatch_log_group" "sftp_server" {
-  name_prefix = "${var.project}-sftp-"
+  name_prefix = "${var.project}-${var.environment}-sftp-"
 }
 
 resource "aws_transfer_server" "this" {
@@ -71,11 +72,12 @@ resource "aws_transfer_server" "this" {
 
   tags = {
     Project = var.project
+    Environment = var.environment
   }
 }
 
 resource "aws_iam_role" "sftp_logging" {
-  name = "${var.project}-sftp-logging-role"
+  name = "${var.project}-${var.environment}-sftp-logging-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -108,6 +110,7 @@ resource "aws_iam_role" "sftp_logging" {
 
   tags = {
     Project = var.project
+    Environment = var.environment
   }
 }
 

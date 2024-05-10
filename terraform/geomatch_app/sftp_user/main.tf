@@ -55,7 +55,7 @@ resource "aws_iam_role" "sftp_user" {
 
   tags = {
     Project     = var.project
-    Environment = var.environment 
+    Environment = var.environment
   }
 }
 
@@ -68,7 +68,7 @@ resource "aws_transfer_user" "this" {
 
   tags = {
     Project     = var.project
-    Environment = var.environment 
+    Environment = var.environment
   }
 }
 
@@ -84,7 +84,7 @@ resource "aws_s3_bucket" "this" {
 
   tags = {
     Project     = var.project
-    Environment = var.environment 
+    Environment = var.environment
   }
 }
 
