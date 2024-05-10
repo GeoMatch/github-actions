@@ -71,7 +71,7 @@ resource "aws_transfer_workflow" "post_upload" {
 
   steps {
     copy_step_details {
-      name                 = "${var.project}-${var.environment}-copy-s3-to-efs"
+      name                 = "${var.project}-${var.environment}-copy"
       source_file_location = "$${original.file}"
       destination_file_location {
         efs_file_location {
