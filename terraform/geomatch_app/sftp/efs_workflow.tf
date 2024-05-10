@@ -10,7 +10,7 @@ module "sftp_efs" {
 }
 
 locals {
-  s3_bucket_prefix = "${var.project}-${var.environment}-"
+  s3_bucket_prefix = "${var.project}-"
   s3_bucket_suffix = "-sftp"
 }
 
