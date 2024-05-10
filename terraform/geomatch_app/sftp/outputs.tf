@@ -11,5 +11,5 @@ output "s3_bucket_prefix" {
 }
 
 output "s3_bucket_suffix" {
-  value = local.s3_bucket_prefix
+  value = local.s3_bucket_suffix
 }
