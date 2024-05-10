@@ -82,7 +82,7 @@ resource "aws_transfer_ssh_key" "this" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.sftp_module.s3_bucket_prefix}${var.user_id}${var.sftp_module.s3_bucket_suffix}"
+  bucket = "${var.sftp_module.s3_bucket_prefix}${var.environment}-${var.user_id}${var.sftp_module.s3_bucket_suffix}"
 
   tags = {
     Project     = var.project
