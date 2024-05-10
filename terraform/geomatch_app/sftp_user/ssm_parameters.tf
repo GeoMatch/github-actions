@@ -27,7 +27,7 @@ resource "aws_ssm_parameter" "user_public_key" {
 data "aws_ssm_parameter" "user_public_key" {
   name = local.ssm_name_user_public_key
   depends_on = [
-    aws_ssm_parameter.prod_user_public_key
+    aws_ssm_parameter.user_public_key
   ]
 }
 
