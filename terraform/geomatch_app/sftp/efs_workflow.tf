@@ -66,28 +66,28 @@ resource "aws_iam_role" "transfer_workflow" {
   }
 }
 
-resource "aws_transfer_workflow" "post_upload" {
-  description = "Copies files from SFTP S3 to EFS"
+# resource "aws_transfer_workflow" "post_upload" {
+#   description = "Copies files from SFTP S3 to EFS"
 
-  steps {
-    copy_step_details {
-      name                 = "${var.project}-${var.environment}-copy"
-      source_file_location = "$${original.file}"
-      destination_file_location {
-        efs_file_location {
-          file_system_id = module.sftp_efs.file_system_id
-          path           = "uploads/$${transfer:UserName}/$${transfer:UploadDate}/"
-        }
-      }
-      # overwrite_existing = true
-    }
-    type = "COPY"
-  }
+#   steps {
+#     copy_step_details {
+#       name                 = "${var.project}-${var.environment}-copy"
+#       source_file_location = "$${original.file}"
+#       destination_file_location {
+#         efs_file_location {
+#           file_system_id = module.sftp_efs.file_system_id
+#           path           = "uploads/$${transfer:UserName}/$${transfer:UploadDate}/"
+#         }
+#       }
+#       # overwrite_existing = true
+#     }
+#     type = "COPY"
+#   }
 
-  tags = {
-    Project     = var.project
-    Environment = var.environment
-  }
-}
+#   tags = {
+#     Project     = var.project
+#     Environment = var.environment
+#   }
+# }
 
 
