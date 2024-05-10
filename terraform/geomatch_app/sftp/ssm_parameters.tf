@@ -1,5 +1,5 @@
 locals {
-  ssm_name_prefix           = "/${var.project}"
+  ssm_name_prefix           = "/${var.project}/${var.environment}"
   ssm_name_host_private_key = "${local.ssm_name_prefix}/SFTP_HOST_PRIVATE_KEY"
   ssm_name_host_public_key  = "${local.ssm_name_prefix}/SFTP_HOST_PUBLIC_KEY"
 }
@@ -18,7 +18,8 @@ resource "aws_ssm_parameter" "host_private_key" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
   }
 }
 
@@ -43,7 +44,8 @@ resource "aws_ssm_parameter" "host_public_key" {
   }
 
   tags = {
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
   }
 }
 

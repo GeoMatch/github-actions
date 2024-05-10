@@ -1,14 +1,13 @@
 locals {
-  ssm_name_prefix                  = "/${var.project}"
-  # TODO(refactor)
-  ssm_name_user_public_key    = "${local.ssm_name_prefix}/SFTP_${upper(var.environment)}_USER_PUBLIC_KEY"
-  ssm_name_username           = "${local.ssm_name_prefix}/SFTP_${upper(var.environment)}_USERNAME"
+  ssm_name_prefix          = "/${var.project}/${var.environment}/${var.user_id}"
+  ssm_name_user_public_key = "${local.ssm_name_prefix}/SFTP_USER_PUBLIC_KEY"
+  ssm_name_username        = "${local.ssm_name_prefix}/SFTP_USERNAME"
 }
 
 resource "aws_ssm_parameter" "user_public_key" {
   name        = local.ssm_name_user_public_key
   type        = "SecureString"
-  value       = "placeholder"
+  value       = var.public_key
   description = "AWS Transfer Family only accepts PEM formatted public keys. See https://docs.aws.amazon.com/transfer/latest/userguide/key-management.html#convert-ssh2-public-key"
   overwrite   = false
 
@@ -19,8 +18,9 @@ resource "aws_ssm_parameter" "user_public_key" {
   }
 
   tags = {
-    # TODO(refactor): Add environment
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
+    UserId      = var.user_id
   }
 }
 
@@ -34,7 +34,7 @@ data "aws_ssm_parameter" "user_public_key" {
 resource "aws_ssm_parameter" "sftp_username" {
   name        = local.ssm_name_username
   type        = "SecureString"
-  value       = "prod-username"
+  value       = var.username
   description = ""
   overwrite   = false
 
@@ -45,8 +45,9 @@ resource "aws_ssm_parameter" "sftp_username" {
   }
 
   tags = {
-    # TODO(refactor): Add environment
-    Project = var.project
+    Project     = var.project
+    Environment = var.environment
+    UserId      = var.user_id
   }
 }
 

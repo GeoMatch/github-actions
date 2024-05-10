@@ -6,6 +6,24 @@ variable "environment" {
   type = string
 }
 
+variable "user_id" {
+  # Note: This is not the username, but an easy to read identifier for the user
+  # Used for resource naming / tagging
+  type = string
+}
+
+variable "username" {
+  type = string
+  # If not supplied, you must set via SSM and re-apply
+  default = "" 
+}
+
+variable "public_key" {
+  type = string
+  # If not supplied, you must set via SSM and re-apply
+  default = "" 
+}
+
 variable "aws_region" {
   type = string
 }
