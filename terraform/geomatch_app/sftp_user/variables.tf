@@ -15,13 +15,13 @@ variable "user_id" {
 variable "username" {
   type = string
   # If not supplied, you must set via SSM and re-apply
-  default = "" 
+  default = ""
 }
 
 variable "public_key" {
   type = string
   # If not supplied, you must set via SSM and re-apply
-  default = "" 
+  default = ""
 }
 
 variable "aws_region" {
@@ -32,6 +32,8 @@ variable "sftp_module" {
   type = object({
     transfer_server_id = string
     sftp_server_up     = bool
+    s3_bucket_prefix   = string
+    s3_bucket_suffix   = string
   })
 }
 

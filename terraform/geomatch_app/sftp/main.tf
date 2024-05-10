@@ -28,7 +28,7 @@ resource "aws_security_group" "this" {
   tags = {
     # SFTP tags are different because we resuse
     # resources across environments.
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
   }
 
@@ -41,7 +41,7 @@ resource "aws_eip" "this" {
   # We never turn down elastic IP so we can keep it associated
   # with our account.
   tags = {
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
   }
 }
@@ -70,8 +70,15 @@ resource "aws_transfer_server" "this" {
     address_allocation_ids = [aws_eip.this.id]
   }
 
+  workflow_details {
+    on_upload {
+      execution_role = aws_iam_role.transfer_workflow.arn
+      workflow_id    = aws_transfer_workflow.post_upload.id
+    }
+  }
+
   tags = {
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
   }
 }
@@ -109,7 +116,7 @@ resource "aws_iam_role" "sftp_logging" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 
   tags = {
-    Project = var.project
+    Project     = var.project
     Environment = var.environment
   }
 }
