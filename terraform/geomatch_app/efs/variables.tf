@@ -10,6 +10,12 @@ variable "aws_region" {
   type = string
 }
 
+variable "efs_name_prefix" {
+  # Should begin with '-' if present (i.e. "-sftp")
+  type    = string
+  default = ""
+}
+
 variable "ssm_name_prefix" {
   type        = string
   description = "should be '/{project}/{environment}'"
