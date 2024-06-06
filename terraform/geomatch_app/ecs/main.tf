@@ -205,7 +205,7 @@ resource "aws_ecs_task_definition" "this" {
       "environment" : [
         {
           "name" : "SKIP_HEALTHCHECK",
-          "value" : "false" 
+          "value" : "false"
         },
         {
           "name" : "GEOMATCH_DATABASE_HOST",
@@ -499,7 +499,7 @@ resource "aws_alb" "this" {
   security_groups            = [aws_security_group.alb.id]
   enable_deletion_protection = true
   # TODO(P1): remove if polling
-  idle_timeout = 240
+  idle_timeout = 60 * 8
 
   # TODO access logs (although Django already collects this)
 
