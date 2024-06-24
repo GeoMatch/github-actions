@@ -12,6 +12,8 @@ terraform {
 locals {
   private_tier_tag = "Private"
   public_tier_tag  = "Public"
+  # TODO: This should definitely be more deterministic
+  one_zone_az_name = data.aws_availability_zones.this.names[0]
 }
 
 // We could filter for state==available here,
