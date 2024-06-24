@@ -455,8 +455,7 @@ resource "aws_security_group" "alb" {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
-    // TODO(P1): ? Limit to VPC as in
-    // https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group
+    // TODO(P1): Limit or remove?
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }

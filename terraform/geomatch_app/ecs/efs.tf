@@ -48,14 +48,6 @@ resource "aws_security_group" "efs" {
   name   = "${var.project}-${var.environment}-efs-sg"
   vpc_id = local.vpc_id
 
-  ingress {
-    protocol        = "tcp"
-    from_port       = 2049
-    to_port         = 2049
-    cidr_blocks     = ["0.0.0.0/0"]
-    security_groups = [aws_security_group.app.id, aws_security_group.r_lambda.id]
-  }
-
   tags = {
     Project     = var.project
     Environment = var.environment
@@ -66,8 +58,36 @@ resource "aws_security_group" "efs" {
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "app_efs" {
+  security_group_id            = aws_security_group.efs.id
+  description                  = "NFS traffic over TCP on port 2049 between the app and EFS volume"
+  referenced_security_group_id = aws_security_group.app.id
+  ip_protocol                  = "tcp"
+  from_port                    = 2049
+  to_port                      = 2049
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    Name        = "${var.project}-${var.environment}-app-efs"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "lambda_efs" {
+  security_group_id            = aws_security_group.efs.id
+  description                  = "NFS traffic over TCP on port 2049 between the lambda and EFS volume"
+  referenced_security_group_id = aws_security_group.r_lambda.id
+  ip_protocol                  = "tcp"
+  from_port                    = 2049
+  to_port                      = 2049
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    Name        = "${var.project}-${var.environment}-lambda-efs"
+  }
+}
+
 resource "aws_efs_mount_target" "this" {
-  file_system_id = var.efs_module.file_system_id
+  file_system_id  = var.efs_module.file_system_id
   subnet_id       = local.efs_mount_target_subnet_id
   security_groups = [aws_security_group.efs.id]
 }
