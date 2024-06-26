@@ -4,7 +4,7 @@ locals {
 }
 
 # This is in ECR module because it's a hard coded build variable
-# to Docker (as a build arg) 
+# to Docker (as a build arg). TODO: we shouldn't do this, and instead pass as var
 resource "aws_ssm_parameter" "container_port" {
   name      = local.ssm_name_container_port
   type      = "String"

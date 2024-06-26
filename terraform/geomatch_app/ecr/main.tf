@@ -15,7 +15,7 @@ terraform {
 }
 
 resource "aws_ecr_repository" "this" {
-  name                 = "${var.project}-${var.environment}-app"
+  name                 = "${var.project}-${var.environment}-${var.ecr_name_suffix}"
   image_tag_mutability = "MUTABLE"
 
   tags = {
