@@ -30,6 +30,12 @@ resource "github_actions_secret" "geomatch_ecr_repo_url" {
   plaintext_value = var.ecr_module.geomatch_app_ecr_repo_url
 }
 
+resource "github_actions_secret" "geomatch_sagemaker_ecr_repo_url" {
+  repository      = local.repo_name
+  secret_name     = "AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL"
+  plaintext_value = var.ecr_module.geomatch_app_ecr_repo_url
+}
+
 resource "github_actions_secret" "geomatch_ecr_repo_name" {
   repository      = local.repo_name
   secret_name     = "AWS_GEOMATCH_ECR_REPO_NAME"

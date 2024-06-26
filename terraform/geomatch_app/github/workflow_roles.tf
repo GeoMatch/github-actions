@@ -94,6 +94,38 @@ resource "aws_iam_role" "github_action_build" {
     })
   }
 
+  inline_policy {
+    name = "github-sm-build-policy"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : [
+            "ecr:BatchCheckLayerAvailability",
+            "ecr:CompleteLayerUpload",
+            "ecr:GetAuthorizationToken",
+            "ecr:BatchGetImage",
+            "ecr:InitiateLayerUpload",
+            "ecr:PutImage",
+            "ecr:GetDownloadUrlForLayer",
+            "ecr:UploadLayerPart"
+          ],
+          "Resource" : [
+            var.sagemaker_ecr_module.geomatch_app_ecr_repo_arn
+          ]
+          "Effect" : "Allow"
+        },
+        {
+          "Action" : [
+            "ecr:GetAuthorizationToken",
+          ],
+          "Effect" : "Allow",
+          "Resource" : "*"
+        }
+      ]
+    })
+  }
+
   tags = {
     Project     = var.project
     Environment = var.environment

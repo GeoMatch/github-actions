@@ -29,6 +29,15 @@ variable "ecr_module" {
   })
 }
 
+variable "sagemaker_ecr_module" {
+  sensitive = true
+  type = object({
+    geomatch_app_ecr_repo_url   = string
+    geomatch_app_ecr_repo_name  = string
+    geomatch_app_ecr_repo_arn   = string
+  })
+}
+
 variable "ecs_module" {
   sensitive = true
   type = object({
