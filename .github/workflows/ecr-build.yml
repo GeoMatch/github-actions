@@ -162,4 +162,4 @@ jobs:
           # NOT output=type=docker
           load: false
           cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:sagemaker-cache"
-          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_SAGEMAKER__ECR_REPO_URL }}:sagemaker-cache"
+          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:sagemaker-cache"
