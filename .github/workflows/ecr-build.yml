@@ -18,8 +18,13 @@ on:
       skip_check:
         required: false
         description: "Skip check fo image"
-        default: false 
+        default: false
         type: boolean
+      extra_target:
+        required: false
+        description: "Extra multi-stage build target to build/push. Will be pushed to tag '$version-$extra_target'"
+        default: ""
+        type: string
 
 # TODO: gha Cache doesn't work for tags?
 # https://github.com/docker/build-push-action/issues/433
@@ -116,50 +121,43 @@ jobs:
           load: false
           cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}-cache"
           cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}-cache"
-  # build-sagemaker:
-  #   name: "Build / Push SageMaker Container"
-  #   needs: [check]
-  #   # && (needs.check.outputs.already-built == 'false' || inputs.skip_check == true)
-  #   if: inputs.target == 'production'
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 60
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-region: ${{ secrets.AWS_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_BUILD_ROLE_ARN }}
-  #         role-session-name: ReleaseBuild
-  #         role-duration-seconds: 1000
-  #     - name: Docker Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
-  #     - name: Setup Docker Buildx
-  #       id: buildx
-  #       uses: docker/setup-buildx-action@v2
-  #       with:
-  #         install: true
-  #     - name: "Build SageMaker image"
-  #       id: docker_build
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         context: .
-  #         file: Dockerfile
-  #         build-args: ${{ env.DOCKER_BUILD_ARGS }}
-  #         tags: |
-  #           "${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:${{ inputs.version }}"
-  #           "${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:latest"
-  #         target: sagemaker-code
-  #         # output=type=registry
-  #         # Not sure if cache-to a tagged image (see below) requires this or not,
-  #         # so just kept it in
-  #         push: true
-  #         # NOT output=type=docker
-  #         load: false
-  #         cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:sagemaker-cache"
-  #         cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_SAGEMAKER_ECR_REPO_URL }}:sagemaker-cache"
+  build-extra:
+    name: "Build / Push Extra Target"
+    if: inputs.extra_target != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_BUILD_ROLE_ARN }}
+          role-session-name: ReleaseBuild
+          role-duration-seconds: 1000
+      - name: Docker Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Setup Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+      - name: "Build Extra Target image"
+        id: docker_build
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          build-args: ${{ env.DOCKER_BUILD_ARGS }}
+          tags: |
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}"
+          target: ${{ inputs.extra_target }}
+          push: true
+          load: false
+          cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}-cache"
+          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}-cache"
