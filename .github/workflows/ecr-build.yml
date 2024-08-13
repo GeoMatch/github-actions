@@ -156,8 +156,9 @@ jobs:
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}"
+            "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.extra_target }}"
           target: ${{ inputs.extra_target }}
           push: true
           load: false
-          cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}-cache"
-          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}-cache"
+          cache-from: "type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.extra_target }}-cache"
+          cache-to: "mode=max,image-manifest=true,type=registry,ref=${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.extra_target }}-cache"
