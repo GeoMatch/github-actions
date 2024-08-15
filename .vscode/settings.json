@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.sh.tpl": "shellscript"
+    },
+    "python.analysis.extraPaths": [
+        "./terraform/geomatch_app/dev_environment/lambda_source"
+    ]
+}
