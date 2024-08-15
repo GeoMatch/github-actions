@@ -10,6 +10,22 @@ variable "aws_region" {
   type = string
 }
 
+variable "backups_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "deny_unsecured_traffic" {
+  type    = bool
+  default = true
+}
+
+variable "read_replica_enabled" {
+  type        = bool
+  description = "Create an EFS read replica"
+  default     = false
+}
+
 variable "efs_name_prefix" {
   # Should begin with '-' if present (i.e. "-sftp")
   type    = string
