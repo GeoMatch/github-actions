@@ -210,7 +210,7 @@ resource "aws_iam_role" "github_action_ecs_run_task" {
 }
 
 resource "aws_iam_role" "github_action_terraform_plan" {
-  count              = var.ecs_module == null ? 0 : 1
+  count              = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
   name               = "${var.project}-${var.environment}-github-action-terraform-plan-role"
   assume_role_policy = data.aws_iam_policy_document.github_actions.json
 
@@ -227,7 +227,7 @@ data "aws_s3_bucket" "state" {
 }
 
 resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
-  count = var.ecs_module == null ? 0 : 1
+  count = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
   name  = "${var.project}-${var.environment}-github-action-terraform-apply-ecs-policy"
 
   policy = jsonencode({
@@ -264,7 +264,17 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         ],
         "Condition" : {
           "ArnEquals" : {
-            "ecs:cluster" : var.ecs_module.ecs_cluster_arn
+            "ecs:cluster" : flatten(concat(
+              var.ecs_module == null ? [] :
+              [
+                var.ecs_module.ecs_cluster_arn
+              ],
+              [
+                for dev_module in var.cloud_dev_modules : [
+                  dev_module.ecs_cluster_arn,
+                ]
+              ]
+            ))
           }
         },
         "Resource" : "*"
@@ -274,10 +284,12 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Action" : [
           "ssm:*",
         ]
-        "Resource" : [
-          var.ecs_module.ssm_geomatch_version_ecs_arn,
-          var.ecs_module.ssm_ecs_run_task_config_arn,
-        ]
+        "Resource" : concat(
+          var.ecs_module == null ? [] : [
+            var.ecs_module.ssm_geomatch_version_ecs_arn,
+            var.ecs_module.ssm_ecs_run_task_config_arn,
+          ]
+        )
       },
       {
         "Effect" : "Allow",
@@ -291,11 +303,18 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Action" : [
           "iam:PassRole"
         ],
-        "Resource" : [
-          var.ecs_module.ecs_task_iam_arn,
-          var.ecs_module.ecs_task_execution_iam_arn,
-          var.ecs_module.lambda_exec_iam_arn,
-        ]
+        "Resource" : flatten(concat(
+          var.ecs_module == null ? [] : [
+            var.ecs_module.ecs_task_iam_arn,
+            var.ecs_module.ecs_task_execution_iam_arn,
+          ],
+          [
+            for dev_module in var.cloud_dev_modules : [
+              dev_module.ecs_task_iam_arn,
+              dev_module.ecs_task_execution_iam_arn,
+            ]
+          ]
+        ))
       },
       {
         "Effect" : "Allow",
@@ -309,7 +328,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Action" : [
           "lambda:*",
         ],
-        "Resource" : [
+        "Resource" : var.ecs_module == null ? [] : [
           var.ecs_module.r_lambda_arn
         ]
       },
@@ -332,9 +351,9 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
           "ecr:GetRepositoryPolicy",
           "ecr:InitiateLayerUpload"
         ],
-        "Resource" : [
+        "Resource" : var.ecs_module == null ? [] : [
           var.ecr_module.geomatch_app_ecr_repo_arn
-        ]
+        ],
         "Effect" : "Allow"
       },
     ]
@@ -342,7 +361,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
 }
 
 resource "aws_iam_role" "github_action_terraform_apply_ecs" {
-  count               = var.ecs_module == null ? 0 : 1
+  count               = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
   name                = "${var.project}-${var.environment}-github-action-terraform-apply-ecs-role"
   assume_role_policy  = data.aws_iam_policy_document.github_actions.json
   managed_policy_arns = [aws_iam_policy.github_action_terraform_apply_ecs_policy[0].arn]

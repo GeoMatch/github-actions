@@ -53,14 +53,14 @@ resource "github_actions_secret" "geomatch_docker_build_args" {
 /* -------------------------------------------------------------------------- */
 
 resource "github_actions_secret" "aws_github_action_terraform_plan_role_arn" {
-  count           = var.ecs_module == null ? 0 : 1
+  count           = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
   repository      = local.repo_name
   secret_name     = "AWS_GITHUB_ACTION_TERRAFORM_PLAN_ROLE_ARN"
   plaintext_value = aws_iam_role.github_action_terraform_plan[0].arn
 }
 
 resource "github_actions_secret" "aws_github_action_terraform_ecs_deploy_role_arn" {
-  count           = var.ecs_module == null ? 0 : 1
+  count           = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
   repository      = local.repo_name
   secret_name     = "AWS_GITHUB_ACTION_TERRAFORM_ECS_DEPLOY_ROLE_ARN"
   plaintext_value = aws_iam_role.github_action_terraform_apply_ecs[0].arn
@@ -108,7 +108,6 @@ resource "github_actions_secret" "geomatch_task_family_name" {
   secret_name     = "AWS_GEOMATCH_TASK_FAMILY_NAME"
 }
 
-# TODO(P3): Pass all subnets and security groups
 resource "github_actions_secret" "geomatch_task_security_group" {
   count           = var.ecs_module == null ? 0 : 1
   plaintext_value = var.ecs_module == null ? "" : var.ecs_module.ecs_task_security_group

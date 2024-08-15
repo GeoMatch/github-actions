@@ -51,6 +51,16 @@ variable "ecs_module" {
   default = null
 }
 
+variable "cloud_dev_modules" {
+  sensitive = true
+  type = list(object({
+    ecs_task_iam_arn           = string
+    ecs_task_execution_iam_arn = string
+    ecs_cluster_arn            = string
+  }))
+  default = []
+}
+
 # TODO source from separate ssm module output
 variable "ssm_name_prefix" {
   type        = string
