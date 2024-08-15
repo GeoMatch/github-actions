@@ -7,6 +7,10 @@ output "cidr_block" {
   value = var.vpc_cidr_block
 }
 
+output "internet_gateway_id" {
+  value = aws_internet_gateway.this.id
+}
+
 output "private_tier_tag" {
   value = local.private_tier_tag
 }
