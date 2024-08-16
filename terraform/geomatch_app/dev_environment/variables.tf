@@ -42,9 +42,9 @@ variable "acm_cert_domain" {
   description = "ACM domain. Must have a matching ACM certificate"
 }
 
-variable "domain_private_subnet_cidr_block" {
+variable "private_subnet_cidr_block" {
   type        = string
-  description = "The CIDR block for the sagemaker domain."
+  description = "The CIDR block for the ECS service and associated resources."
 }
 
 variable "ecs_environment_variables" {
