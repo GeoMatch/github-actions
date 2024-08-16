@@ -91,6 +91,6 @@ TODO
 
 - [ ] Setting up Github action to deploy with https://github.com/webfactory/ssh-agent
 - [ ] See if a github action for ECS deploy can verify what resources are in the plan
-and fail if there's unexpected ones.
+      and fail if there's unexpected ones.
 - [ ] Output build args needed in github build from ecs module
 - [ ] Seperate out networking
