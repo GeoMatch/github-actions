@@ -2,7 +2,7 @@ data "github_ip_ranges" "this" {}
 
 resource "aws_subnet" "ecs" {
   vpc_id            = var.networking_module.vpc_id
-  cidr_block        = var.domain_private_subnet_cidr_block
+  cidr_block        = var.private_subnet_cidr_block
   availability_zone = var.networking_module.one_zone_az_name
 
   tags = {
