@@ -280,18 +280,6 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "ssm:*",
-        ]
-        "Resource" : concat(
-          var.ecs_module == null ? [] : [
-            var.ecs_module.ssm_geomatch_version_ecs_arn,
-            var.ecs_module.ssm_ecs_run_task_config_arn,
-          ]
-        )
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
           "ssm:DescribeParameters"
         ]
         "Resource" : "*"
@@ -325,6 +313,19 @@ resource "aws_iam_policy" "github_action_terraform_apply_lambda_policy" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
+      {
+        # TODO: Technically needed for github CICD
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:*",
+        ]
+        "Resource" : concat(
+          var.ecs_module == null ? [] : [
+            var.ecs_module.ssm_geomatch_version_ecs_arn,
+            var.ecs_module.ssm_ecs_run_task_config_arn,
+          ]
+        )
+      },
       {
         "Effect" : "Allow",
         "Action" : [
