@@ -321,7 +321,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
 }
 
 resource "aws_iam_policy" "github_action_terraform_apply_lambda_policy" {
-  count = var.ecs_module == null == 0 ? 0 : 1
+  count = var.ecs_module == null ? 0 : 1
   name  = "${var.project}-${var.environment}-github-action-terraform-apply-lambda-policy"
 
   policy = jsonencode({
