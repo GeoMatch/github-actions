@@ -351,7 +351,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
           "ecr:GetRepositoryPolicy",
           "ecr:InitiateLayerUpload"
         ],
-        "Resource" : var.ecs_module == null ? [] : [
+        "Resource" : [
           var.ecr_module.geomatch_app_ecr_repo_arn
         ],
         "Effect" : "Allow"
