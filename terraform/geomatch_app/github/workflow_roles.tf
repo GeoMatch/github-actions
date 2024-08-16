@@ -316,6 +316,17 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
           ]
         ))
       },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "github_action_terraform_apply_lambda_policy" {
+  count = var.ecs_module == null == 0 ? 0 : 1
+  name  = "${var.project}-${var.environment}-github-action-terraform-apply-lambda-policy"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
         "Effect" : "Allow",
         "Action" : [
@@ -328,7 +339,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Action" : [
           "lambda:*",
         ],
-        "Resource" : var.ecs_module == null ? [] : [
+        "Resource" : [
           var.ecs_module.r_lambda_arn
         ]
       },
@@ -360,11 +371,15 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
   })
 }
 
+
 resource "aws_iam_role" "github_action_terraform_apply_ecs" {
-  count               = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
-  name                = "${var.project}-${var.environment}-github-action-terraform-apply-ecs-role"
-  assume_role_policy  = data.aws_iam_policy_document.github_actions.json
-  managed_policy_arns = [aws_iam_policy.github_action_terraform_apply_ecs_policy[0].arn]
+  count              = var.ecs_module == null && length(var.cloud_dev_modules) == 0 ? 0 : 1
+  name               = "${var.project}-${var.environment}-github-action-terraform-apply-ecs-role"
+  assume_role_policy = data.aws_iam_policy_document.github_actions.json
+  managed_policy_arns = flatten(concat(
+    [aws_iam_policy.github_action_terraform_apply_ecs_policy[0].arn],
+    var.ecs_module == null ? [] : [aws_iam_policy.github_action_terraform_apply_lambda_policy[0].arn],
+  ))
   tags = {
     Project     = var.project
     Environment = var.environment
