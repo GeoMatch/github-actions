@@ -265,7 +265,7 @@ resource "aws_iam_policy" "github_action_terraform_apply_ecs_policy" {
         "Condition" : {
           "ArnEquals" : {
             "ecs:cluster" : flatten(concat(
-              var.ecs_module == null ? [var.ecs_module.ecs_cluster_arn] : [],
+              var.ecs_module == null ? [] : [var.ecs_module.ecs_cluster_arn],
               length(var.cloud_dev_modules) == 0 ? [] :
               [
                 for dev_module in var.cloud_dev_modules : [
