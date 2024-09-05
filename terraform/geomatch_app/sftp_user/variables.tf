@@ -32,7 +32,6 @@ variable "sftp_module" {
   type = object({
     transfer_server_id = string
     sftp_server_up     = bool
-    lambda_iam_role_id = string
   })
 }
 

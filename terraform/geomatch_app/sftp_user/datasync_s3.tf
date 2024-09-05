@@ -3,7 +3,7 @@ resource "aws_datasync_location_s3" "source" {
   subdirectory  = "/"
 
   s3_config {
-    bucket_access_role_arn = aws_iam_role.datasync_role.arn
+    bucket_access_role_arn = aws_iam_role.datasync_s3.arn
   }
 
   tags = {
