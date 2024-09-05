@@ -54,9 +54,6 @@ resource "aws_iam_role_policy" "datasync_efs" {
           "efs:ClientWrite",
           "efs:ClientRootAccess"
         ],
-        Principal = {
-          "AWS" = aws_iam_role.datasync_efs.arn
-        },
         Effect   = "Allow",
         Resource = [module.sftp_efs.file_system_arn],
         Condition = {

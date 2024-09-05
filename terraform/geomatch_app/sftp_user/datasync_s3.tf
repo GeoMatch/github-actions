@@ -46,11 +46,11 @@ resource "aws_iam_role_policy" "datasync_s3" {
         Action = [
           "s3:GetBucketLocation",
           "s3:ListBucket",
-          "s3:GetObject"
+          "s3:ListBucketMultipartUploads"
         ],
         Effect = "Allow",
         Resource = [
-          "${aws_datasync_location_s3.source.s3_bucket_arn}",
+          "${aws_s3_bucket.this.arn}",
         ]
       },
       {
@@ -64,7 +64,7 @@ resource "aws_iam_role_policy" "datasync_s3" {
         ],
         Effect = "Allow",
         Resource = [
-          "${aws_datasync_location_s3.source.s3_bucket_arn}/*"
+          "${aws_s3_bucket.this.arn}/*"
         ]
       },
     ]
