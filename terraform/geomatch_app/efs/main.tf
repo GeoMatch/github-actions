@@ -65,13 +65,21 @@ resource "aws_security_group" "mount_target" {
   vpc_id = var.networking_module.vpc_id
 
   ingress {
-    description = "NFS traffic over TCP on port 2049 between the lambda and EFS volume"
+    description = "NFS traffic over TCP on port 2049 between the resource and EFS volume"
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
     self        = true
     # We use 'self=true' and output this SG ID so that any consumer
     # of EFS can add this SG to their own resources and access the mount target.
+  }
+
+  egress {
+    description = "NFS traffic over TCP on port 2049 between the resource and EFS volume"
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    self        = true
   }
 
   tags = {
