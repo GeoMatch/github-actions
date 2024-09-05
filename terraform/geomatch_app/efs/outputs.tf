@@ -7,7 +7,8 @@ output "file_system_arn" {
 }
 
 output "mount_target_sg_id" {
-  value = aws_security_group.mount_target.id
+  description = "Add this security group to your resources to receive access to the EFS's mount target."
+  value       = aws_security_group.mount_target.id
 }
 
 output "read_replica_file_system_id" {
@@ -19,5 +20,6 @@ output "read_replica_file_system_arn" {
 }
 
 output "read_replica_mount_target_sg_id" {
-  value = aws_security_group.mount_target.id
+  description = "Add this security group to your resources to receive access to the EFS's mount target."
+  value       = aws_security_group.mount_target.id
 }

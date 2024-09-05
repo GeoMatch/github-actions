@@ -1,3 +1,7 @@
+data "aws_security_group" "efs_mount_target" {
+  id = module.sftp_efs.mount_target_sg_id
+}
+
 resource "aws_datasync_location_efs" "destination" {
   access_point_arn            = aws_efs_access_point.this.arn
   efs_file_system_arn         = module.sftp_efs.file_system_arn
@@ -6,7 +10,7 @@ resource "aws_datasync_location_efs" "destination" {
   subdirectory                = "/"
 
   ec2_config {
-    security_group_arns = [aws_security_group.efs.arn]
+    security_group_arns = [data.aws_security_group.efs_mount_target.arn]
     # AWS manages network interfaces:
     subnet_arn = data.aws_subnet.one_zone_private.arn
   }
