@@ -67,11 +67,12 @@ variable "ecs_secrets" {
 
 variable "efs_configs" {
   type = map(object({
-    file_system_id = string
-    volume_name    = string # Docker volume name
-    mount_path     = string # Docker mount path (i.e. '/data')
-    root_directory = string # Path to mount on EFS (i.e. '/data')
-    read_only      = bool
+    file_system_id     = string
+    volume_name        = string # Docker volume name
+    mount_path         = string # Docker mount path (i.e. '/data')
+    root_directory     = string # Path to mount on EFS (i.e. '/data')
+    read_only          = bool
+    mount_target_sg_id = string
   }))
   default = {}
 }

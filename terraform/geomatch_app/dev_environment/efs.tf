@@ -1,12 +1,4 @@
 
-resource "aws_efs_mount_target" "this" {
-  for_each = var.efs_configs
-
-  file_system_id  = each.value.file_system_id
-  subnet_id       = aws_subnet.ecs.id
-  security_groups = [aws_security_group.efs.id]
-}
-
 resource "aws_efs_access_point" "this" {
   for_each = var.efs_configs
 
@@ -32,27 +24,5 @@ resource "aws_efs_access_point" "this" {
     VolumeName = each.value.volume_name
     MountPath  = each.value.mount_path
     ReadOnly   = each.value.read_only
-  }
-}
-
-resource "aws_security_group" "efs" {
-  name   = "${local.name_prefix}-efs-sg"
-  vpc_id = var.networking_module.vpc_id
-
-  ingress {
-    description     = "NFS traffic over TCP on port 2049 between the app and EFS volume"
-    security_groups = [aws_security_group.ecs.id]
-    from_port       = 2049
-    to_port         = 2049
-    protocol        = "tcp"
-  }
-
-  tags = {
-    Project     = var.project
-    Environment = var.environment
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }

@@ -284,9 +284,16 @@ resource "aws_ecs_service" "this" {
     subnets          = [aws_subnet.ecs.id]
     assign_public_ip = false
 
-    security_groups = [
-      aws_security_group.ecs.id,
-    ]
+    security_groups = flatten(concat(
+      [
+        aws_security_group.ecs.id,
+      ],
+      [
+        for efs_name, efs_config in var.efs_configs : [
+          efs_config.mount_target_sg_id
+        ]
+      ]
+    ))
   }
 
   load_balancer {

@@ -6,10 +6,18 @@ output "file_system_arn" {
   value = aws_efs_file_system.this.arn
 }
 
+output "mount_target_sg_id" {
+  value = aws_security_group.mount_target.id
+}
+
 output "read_replica_file_system_id" {
   value = var.read_replica_enabled ? aws_efs_file_system.replica[0].id : null
 }
 
 output "read_replica_file_system_arn" {
   value = var.read_replica_enabled ? aws_efs_file_system.replica[0].arn : null
+}
+
+output "read_replica_mount_target_sg_id" {
+  value = aws_security_group.mount_target.id
 }
