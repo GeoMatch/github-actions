@@ -32,8 +32,7 @@ variable "sftp_module" {
   type = object({
     transfer_server_id = string
     sftp_server_up     = bool
-    s3_bucket_prefix   = string
-    s3_bucket_suffix   = string
+    lambda_iam_role_id = string
   })
 }
 

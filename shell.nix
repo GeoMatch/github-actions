@@ -27,14 +27,14 @@ stdenv.mkDerivation {
       # Execute in a subshell to avoid polluting the environment
       (
         source_lambda_env
-        python terraform/geomatch_app/sagemaker/lambda_source/instances.py
+        python terraform/geomatch_app/sftp/lambda_source/instances.py
       )
     }
     lambda_access() {
       # Execute in a subshell to avoid polluting the environment
       (
         source_lambda_env
-        python terraform/geomatch_app/sagemaker/lambda_source/access.py
+        python terraform/geomatch_app/sftp/lambda_source/access.py
       )
     }
   '';
