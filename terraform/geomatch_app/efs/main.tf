@@ -164,6 +164,7 @@ resource "aws_efs_file_system_policy" "replica" {
 }
 
 resource "aws_security_group" "mount_target_replica" {
+  count  = var.read_replica_enabled ? 1 : 0
   name   = "${local.name_prefix}-efs-replica-mt-sg"
   vpc_id = var.networking_module.vpc_id
 
