@@ -35,8 +35,9 @@ resource "aws_iam_role" "ecs_task" {
 }
 
 resource "aws_iam_role_policy" "s3" {
-  name = "${local.name_prefix}-s3-policy"
-  role = aws_iam_role.ecs_task.id
+  count = length(var.s3_configs) > 0 ? 1 : 0
+  name  = "${local.name_prefix}-s3-policy"
+  role  = aws_iam_role.ecs_task.id
 
   policy = jsonencode({
     "Version" : "2012-10-17",
