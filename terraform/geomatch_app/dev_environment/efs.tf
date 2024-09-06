@@ -12,11 +12,11 @@ resource "aws_efs_access_point" "this" {
     path = each.value.root_directory
     # No creation_info to avoid mounting issues:
     # https://repost.aws/knowledge-center/efs-access-point-configurations
-    # creation_info {
-    #   permissions = each.value.read_only ? 555 : 755
-    #   owner_gid   = "1000"
-    #   owner_uid   = "1000"
-    # }
+    creation_info {
+      permissions = each.value.read_only ? 555 : 755
+      owner_gid   = "1000"
+      owner_uid   = "1000"
+    }
   }
   tags = {
     Project     = var.project
