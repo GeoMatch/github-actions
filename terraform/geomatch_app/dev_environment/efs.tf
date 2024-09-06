@@ -10,13 +10,13 @@ resource "aws_efs_access_point" "this" {
   }
   root_directory {
     path = each.value.root_directory
-    # Probably not used since root directory should already
-    # be created for existing file systems
-    creation_info {
-      permissions = each.value.read_only ? 555 : 755
-      owner_gid   = "1000"
-      owner_uid   = "1000"
-    }
+    # No creation_info to avoid mounting issues:
+    # https://repost.aws/knowledge-center/efs-access-point-configurations
+    # creation_info {
+    #   permissions = each.value.read_only ? 555 : 755
+    #   owner_gid   = "1000"
+    #   owner_uid   = "1000"
+    # }
   }
   tags = {
     Project     = var.project

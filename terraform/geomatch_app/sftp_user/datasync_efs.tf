@@ -20,27 +20,30 @@ resource "aws_efs_mount_target" "this" {
 }
 
 locals {
-  # Picked arbitrarily
-  datasync_uid = 1888
-  datasync_gid = 1888
+  root_uid = 0
 }
 
 resource "aws_efs_access_point" "this" {
   file_system_id = module.sftp_efs.file_system_id
 
-  # Creates read-only access point for DataSync
+  # Creates root user access point for DataSync
+  # All files will be owned by root 
+  # Root squashing is disabled due to ClientRootAccess IAM permission
+  # See https://repost.aws/knowledge-center/efs-access-point-configurations
   posix_user {
-    # TODO: Might need root here and below?
-    gid = local.datasync_gid
-    uid = local.datasync_uid
+    gid = local.root_uid
+    uid = local.root_uid
   }
 
   root_directory {
     path = "/"
+
+    # I think it's possible that these aren't actually
+    # used and 777 root directory is created automatically.
     creation_info {
-      permissions = 755 # Read/write for datasync. Read-only for others
-      owner_gid   = local.datasync_gid
-      owner_uid   = local.datasync_uid
+      owner_uid   = local.root_uid
+      owner_gid   = local.root_uid
+      permissions = "0644" # Read only for everyone but root
     }
   }
   tags = {
@@ -107,7 +110,7 @@ resource "aws_iam_role_policy" "datasync_efs" {
           "efs:ClientRootAccess"
         ],
         Effect   = "Allow",
-        Resource = [module.sftp_efs.file_system_arn],
+        Resource = module.sftp_efs.file_system_arn,
         Condition = {
           Bool = {
             "aws:SecureTransport" = "true"
