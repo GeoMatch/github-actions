@@ -177,6 +177,13 @@ resource "aws_security_group" "mount_target_replica" {
     # of EFS can add this SG to their own resources and access the mount target.
   }
 
+  egress {
+    description = "NFS traffic over TCP on port 2049 between the resource and EFS volume"
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    self        = true
+  }
   tags = {
     Project     = var.project
     Environment = var.environment

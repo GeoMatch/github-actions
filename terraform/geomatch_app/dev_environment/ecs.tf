@@ -35,8 +35,6 @@ resource "aws_iam_role" "ecs_task" {
 }
 
 resource "aws_iam_role_policy" "s3" {
-  for_each = var.s3_configs
-
   name = "${local.name_prefix}-s3-policy"
   role = aws_iam_role.ecs_task.id
 
@@ -54,36 +52,12 @@ resource "aws_iam_role_policy" "s3" {
       {
         "Action" : "s3:*",
         "Effect" : "Allow",
-        "Resource" : ["${each.value.arn}", "${each.value.arn}/*"]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "efs" {
-  for_each = aws_efs_access_point.this
-
-  name = "${local.name_prefix}-efs-policy"
-  role = aws_iam_role.ecs_task.id
-
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite",
-          # TODO: Remove after testing:
-          "elasticfilesystem:ClientRootAccess"
-        ],
-        "Resource" : "*"
-        # "Resource" : var.efs_module.file_system_arn,
-        "Condition" : {
-          "StringEquals" : {
-            "elasticfilesystem:AccessPointArn" : each.value.arn
-          }
-        }
+        "Resource" : flatten([
+          for s3_name, s3_config in var.s3_configs : [
+            s3_config.arn,
+            "${s3_config.arn}/*"
+          ]
+        ])
       }
     ]
   })

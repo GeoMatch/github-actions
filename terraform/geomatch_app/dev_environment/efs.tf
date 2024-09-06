@@ -28,3 +28,28 @@ resource "aws_efs_access_point" "this" {
     ReadOnly   = each.value.read_only
   }
 }
+
+resource "aws_iam_role_policy" "efs" {
+  name = "${local.name_prefix}-efs-policy"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+        ],
+        "Resource" : "*"
+        # "Resource" : var.efs_module.file_system_arn,
+        "Condition" : {
+          "StringEquals" : {
+            "elasticfilesystem:AccessPointArn" : values(aws_efs_access_point.this)[*].arn
+          }
+        }
+      }
+    ]
+  })
+}
