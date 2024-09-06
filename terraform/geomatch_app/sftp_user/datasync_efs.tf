@@ -2,6 +2,48 @@ data "aws_security_group" "efs_mount_target" {
   id = module.sftp_efs.mount_target_sg_id
 }
 
+module "sftp_efs" {
+  source = "../efs"
+
+  efs_name_prefix   = "-sftp-${var.user_id}"
+  aws_region        = var.aws_region
+  project           = var.project
+  environment       = var.environment
+  networking_module = var.networking_module
+  ssm_name_prefix   = local.ssm_name_prefix
+}
+
+resource "aws_efs_mount_target" "this" {
+  file_system_id  = module.sftp_efs.file_system_id
+  subnet_id       = var.networking_module.one_zone_private_subnet_id
+  security_groups = [module.sftp_efs.mount_target_sg_id]
+}
+
+resource "aws_efs_access_point" "this" {
+  file_system_id = module.sftp_efs.file_system_id
+
+  # Creates read-only access point for DataSync
+  posix_user {
+    # TODO: Might need root here and below?
+    gid = "datasync"
+    uid = "datasync"
+  }
+
+  root_directory {
+    path = "/"
+    creation_info {
+      permissions = 755 # Read/write for datasync. Read-only for others
+      owner_gid   = "datasync"
+      owner_uid   = "datasync"
+    }
+  }
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+    Name        = "${local.name_prefix}-efs-ap"
+  }
+}
+
 resource "aws_datasync_location_efs" "destination" {
   access_point_arn            = aws_efs_access_point.this.arn
   efs_file_system_arn         = module.sftp_efs.file_system_arn

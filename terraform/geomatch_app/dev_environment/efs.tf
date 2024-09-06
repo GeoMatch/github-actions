@@ -10,6 +10,8 @@ resource "aws_efs_access_point" "this" {
   }
   root_directory {
     path = each.value.root_directory
+    # Probably not used since root directory should already
+    # be created for existing file systems
     creation_info {
       permissions = each.value.read_only ? 555 : 755
       owner_gid   = "1000"

@@ -8,6 +8,14 @@ resource "aws_datasync_task" "s3_to_efs" {
     schedule_expression = "cron(0 13 ? * * *)"
   }
 
+  options {
+    # Permissions are set via the access point defined
+    # in datasync_efs.tf
+    uid               = "NONE"
+    gid               = "NONE"
+    posix_permissions = "NONE"
+  }
+
   # TODO: S3 reports (supported by AWS, see documentation for this resource)
 
   tags = {
