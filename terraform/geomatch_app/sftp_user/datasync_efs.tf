@@ -49,7 +49,7 @@ resource "aws_efs_access_point" "this" {
   tags = {
     Project     = var.project
     Environment = var.environment
-    Name        = "${local.name_prefix}-efs-ap"
+    Name        = "${local.name_prefix}-efs-datasync-ap"
   }
 }
 
