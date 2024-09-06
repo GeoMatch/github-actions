@@ -73,7 +73,9 @@ resource "aws_iam_role_policy" "efs" {
         "Effect" : "Allow",
         "Action" : [
           "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite"
+          "elasticfilesystem:ClientWrite",
+          # TODO: Remove after testing:
+          "elasticfilesystem:ClientRootAccess"
         ],
         "Resource" : "*"
         # "Resource" : var.efs_module.file_system_arn,
