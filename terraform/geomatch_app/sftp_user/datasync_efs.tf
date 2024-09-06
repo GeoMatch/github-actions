@@ -12,7 +12,7 @@ module "sftp_efs" {
   networking_module = var.networking_module
   ssm_name_prefix   = local.ssm_name_prefix
 
-  extra_fs_policy_documents_json = data.aws_iam_policy_document.root_fs_access.json
+  extra_fs_policy_documents_json = [data.aws_iam_policy_document.root_fs_access.json]
 }
 
 resource "aws_efs_mount_target" "this" {
