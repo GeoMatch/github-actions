@@ -19,22 +19,28 @@ resource "aws_efs_mount_target" "this" {
   security_groups = [module.sftp_efs.mount_target_sg_id]
 }
 
+locals {
+  # Picked arbitrarily
+  datasync_uid = 1888
+  datasync_gid = 1888
+}
+
 resource "aws_efs_access_point" "this" {
   file_system_id = module.sftp_efs.file_system_id
 
   # Creates read-only access point for DataSync
   posix_user {
     # TODO: Might need root here and below?
-    gid = "datasync"
-    uid = "datasync"
+    gid = local.datasync_gid
+    uid = local.datasync_uid
   }
 
   root_directory {
     path = "/"
     creation_info {
       permissions = 755 # Read/write for datasync. Read-only for others
-      owner_gid   = "datasync"
-      owner_uid   = "datasync"
+      owner_gid   = local.datasync_gid
+      owner_uid   = local.datasync_uid
     }
   }
   tags = {
