@@ -11,6 +11,8 @@ module "sftp_efs" {
   environment       = var.environment
   networking_module = var.networking_module
   ssm_name_prefix   = local.ssm_name_prefix
+
+  extra_fs_policy_documents_json = data.aws_iam_policy_document.root_fs_access.json
 }
 
 resource "aws_efs_mount_target" "this" {
@@ -40,11 +42,11 @@ resource "aws_efs_access_point" "this" {
 
     # I think it's possible that these aren't actually
     # used and 777 root directory is created automatically.
-    creation_info {
-      owner_uid   = local.root_uid
-      owner_gid   = local.root_uid
-      permissions = "0644" # Read only for everyone but root
-    }
+    # creation_info {
+    #   owner_uid   = local.root_uid
+    #   owner_gid   = local.root_uid
+    #   permissions = "0644" # Read only for everyone but root
+    # }
   }
   tags = {
     Project     = var.project
@@ -96,30 +98,31 @@ resource "aws_iam_role" "datasync_efs" {
   }
 }
 
-resource "aws_iam_role_policy" "datasync_efs" {
-  name = "${local.name_prefix}-datasync-efs-policy"
-  role = aws_iam_role.datasync_efs.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = [
-          "efs:ClientMount",
-          "efs:ClientWrite",
-          "efs:ClientRootAccess"
-        ],
-        Effect   = "Allow",
-        Resource = module.sftp_efs.file_system_arn,
-        Condition = {
-          Bool = {
-            "aws:SecureTransport" = "true"
-          },
-          StringEquals = {
-            "elasticfilesystem:AccessPointArn" = aws_efs_access_point.this.arn
-          }
-        }
-      }
+data "aws_iam_policy_document" "root_fs_access" {
+  statement {
+    sid = "${local.name_prefix}-root-fs-access"
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite",
+      "elasticfilesystem:ClientRootAccess"
     ]
-  })
+    effect = "Allow"
+    resources = [
+      module.sftp_efs.file_system_arn
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.datasync_efs.arn]
+    }
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "elasticfilesystem:AccessPointArn"
+      values   = [aws_efs_access_point.this.arn]
+    }
+  }
 }

@@ -26,6 +26,12 @@ variable "read_replica_enabled" {
   default     = false
 }
 
+variable "extra_fs_policy_documents_json" {
+  type        = list(string)
+  description = "Extra file system policy documents. Input the 'json' attribute from data.aws_iam_policy_document"
+  default     = []
+}
+
 variable "efs_name_prefix" {
   # Should begin with '-' if present (i.e. "-sftp")
   type    = string

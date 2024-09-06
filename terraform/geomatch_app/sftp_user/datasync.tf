@@ -8,11 +8,12 @@ resource "aws_datasync_task" "s3_to_efs" {
     schedule_expression = "cron(0 13 ? * * *)"
   }
 
+  # https://docs.aws.amazon.com/datasync/latest/userguide/API_Options.html
   options {
     # Permissions are set via the access point defined
     # in datasync_efs.tf
-    uid               = local.root_uid
-    gid               = local.root_uid
+    uid               = "NONE" 
+    gid               = "NONE" 
     posix_permissions = "NONE"
   }
 

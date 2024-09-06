@@ -32,31 +32,35 @@ resource "aws_efs_file_system" "this" {
   }
 }
 
+data "aws_iam_policy_document" "file_system" {
+  source_policy_documents = var.extra_fs_policy_documents_json
+
+  # Deny any traffic that isn't secure by default
+  statement {
+    sid    = "default-deny-unsecured"
+    effect = "Deny"
+    actions = [
+      "*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    resources = [
+      aws_efs_file_system.this.arn
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
 resource "aws_efs_file_system_policy" "this" {
   count          = var.deny_unsecured_traffic ? 1 : 0
   file_system_id = aws_efs_file_system.this.id
-
-  # Deny any traffic that isn't secure by default
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Deny",
-          "Principal" : {
-            "AWS" : "*"
-          },
-          "Resource" : aws_efs_file_system.this.arn,
-          "Action" : "*",
-          "Condition" : {
-            "Bool" : {
-              "aws:SecureTransport" : "false"
-            }
-          }
-        }
-      ]
-    }
-  )
+  policy         = data.aws_iam_policy_document.file_system.json
 }
 
 # TODO(#18): Move mount_target (and its subnet) resources to this module as well.
