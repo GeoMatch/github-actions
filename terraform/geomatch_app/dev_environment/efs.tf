@@ -3,19 +3,14 @@ resource "aws_efs_access_point" "this" {
   for_each = var.efs_configs
 
   file_system_id = each.value.file_system_id
-  # Any client using this AP will act as the following user:
-  posix_user {
-    gid = "1000"
-    uid = "1000"
-  }
+  # Any client using this AP will act as logged-in user 
   root_directory {
     path = each.value.root_directory
-    # No creation_info to avoid mounting issues:
     # https://repost.aws/knowledge-center/efs-access-point-configurations
     creation_info {
-      permissions = each.value.read_only ? 555 : 755
-      owner_gid   = "1000"
-      owner_uid   = "1000"
+      permissions = 755
+      owner_gid   = "0"
+      owner_uid   = "0"
     }
   }
   tags = {
@@ -26,11 +21,14 @@ resource "aws_efs_access_point" "this" {
     VolumeName = each.value.volume_name
     MountPath  = each.value.mount_path
     ReadOnly   = each.value.read_only
+    RootAccess = each.value.root_access
   }
 }
 
 resource "aws_iam_role_policy" "efs" {
-  name = "${local.name_prefix}-efs-policy"
+  for_each = aws_efs_access_point.this
+
+  name = "${local.name_prefix}-efs-policy-${each.value.tags["VolumeName"]}"
   role = aws_iam_role.ecs_task.id
 
   policy = jsonencode({
@@ -38,15 +36,17 @@ resource "aws_iam_role_policy" "efs" {
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Action" : [
+        "Action" : concat([
           "elasticfilesystem:ClientMount",
           "elasticfilesystem:ClientWrite",
-        ],
+          ],
+          lower(each.value.tags["RootAccess"]) == "true" ?
+        ["elasticfilesystem:ClientRootAccess"] : []),
         "Resource" : "*"
         # "Resource" : var.efs_module.file_system_arn,
         "Condition" : {
           "StringEquals" : {
-            "elasticfilesystem:AccessPointArn" : values(aws_efs_access_point.this)[*].arn
+            "elasticfilesystem:AccessPointArn" : each.value.arn
           }
         }
       }
