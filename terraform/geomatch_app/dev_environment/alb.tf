@@ -7,12 +7,12 @@ resource "aws_lb_target_group" "this" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "300"
+    interval            = "20"
     protocol            = "HTTP"
     matcher             = "200"
-    timeout             = "3"
-    path                = "/"
-    unhealthy_threshold = "2"
+    timeout             = "30"
+    path                = var.health_check_path
+    unhealthy_threshold = "3"
   }
 
   tags = {
@@ -32,8 +32,8 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = var.alb_module.alb_arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn = data.aws_acm_certificate.this.arn
-  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_acm_certificate.this.arn
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   # TODO(P2): Consider listener rules to suppliment Stanford-VPN limited security group rule
   default_action {
