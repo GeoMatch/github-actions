@@ -1,5 +1,5 @@
 data "aws_security_group" "efs_mount_target" {
-  id = module.sftp_efs.mount_target_sg_id
+  id = var.efs_module.mount_target_sg_id
 }
 
 locals {

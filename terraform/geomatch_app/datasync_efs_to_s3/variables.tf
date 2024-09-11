@@ -17,8 +17,9 @@ variable "aws_region" {
 variable "efs_module" {
   sensitive = true
   type = object({
-    file_system_id  = string
-    file_system_arn = string
+    file_system_id     = string
+    file_system_arn    = string
+    mount_target_sg_id = string
   })
 }
 
