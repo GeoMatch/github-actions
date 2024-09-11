@@ -4,8 +4,8 @@ resource "aws_datasync_task" "this" {
   destination_location_arn = aws_datasync_location_s3.destination.arn
   #   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_logs.arn
   schedule {
-    # Every 10min
-    schedule_expression = "cron(0/10 * * * ? *)"
+    # Every hour
+    schedule_expression = "cron(0 * * * ? *)"
   }
 
   # TODO: S3 reports (supported by AWS, see documentation for this resource)
