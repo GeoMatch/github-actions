@@ -78,6 +78,13 @@ variable "efs_configs" {
     # If true, EFS will be mounted as read-only Docker volume.
     read_only          = bool
     mount_target_sg_id = string
+
+    # https://repost.aws/knowledge-center/efs-access-point-configurations
+    # Set the following uid/g variables to empty string to remove block
+    root_dir_creator_uid_gid_number     = string
+    root_dir_creation_posix_permissions = number
+    # Any client using this AP will act as logged-in user 
+    ap_user_uid_gid_number = string
   }))
   default = {}
 }

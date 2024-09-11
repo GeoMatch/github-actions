@@ -3,14 +3,25 @@ resource "aws_efs_access_point" "this" {
   for_each = var.efs_configs
 
   file_system_id = each.value.file_system_id
-  # Any client using this AP will act as logged-in user 
+
+  dynamic "posix_user" {
+    for_each = each.value.ap_user_uid_gid_number != "" ? [1] : []
+    content {
+      uid = each.value.ap_user_uid_gid_number
+      gid = each.value.ap_user_uid_gid_number
+    }
+  }
+
+  # https://repost.aws/knowledge-center/efs-access-point-configurations
   root_directory {
     path = each.value.root_directory
-    # https://repost.aws/knowledge-center/efs-access-point-configurations
-    creation_info {
-      permissions = 755
-      owner_gid   = "0"
-      owner_uid   = "0"
+    dynamic "creation_info" {
+      for_each = each.value.root_dir_creator_uid_gid_number != "" ? [1] : []
+      content {
+        permissions = each.value.root_dir_creation_posix_permissions
+        owner_gid   = each.value.root_dir_creator_uid_gid_number
+        owner_uid   = each.value.root_dir_creator_uid_gid_number
+      }
     }
   }
   tags = {

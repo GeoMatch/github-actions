@@ -14,6 +14,14 @@ variable "aws_region" {
   type = string
 }
 
+variable "efs_module" {
+  sensitive = true
+  type = object({
+    file_system_id  = string
+    file_system_arn = string
+  })
+}
+
 variable "networking_module" {
   type = object({
     vpc_id                     = string
