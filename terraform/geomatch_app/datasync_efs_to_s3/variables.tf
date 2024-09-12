@@ -6,32 +6,20 @@ variable "environment" {
   type = string
 }
 
-variable "user_id" {
-  # Note: This is not the username, but an easy to read identifier for the user
-  # Used for resource naming / tagging
+variable "name_suffix" {
   type = string
-}
-
-variable "username" {
-  type = string
-  # If not supplied, you must set via SSM and re-apply
-  default = ""
-}
-
-variable "public_key" {
-  type = string
-  # If not supplied, you must set via SSM and re-apply
-  default = ""
 }
 
 variable "aws_region" {
   type = string
 }
 
-variable "sftp_module" {
+variable "efs_module" {
+  sensitive = true
   type = object({
-    transfer_server_id = string
-    sftp_server_up     = bool
+    file_system_id     = string
+    file_system_arn    = string
+    mount_target_sg_id = string
   })
 }
 

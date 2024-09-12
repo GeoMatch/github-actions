@@ -10,11 +10,16 @@ terraform {
 }
 
 locals {
-  vpc_id = var.networking_module.vpc_id
+  vpc_id      = var.networking_module.vpc_id
+  name_prefix = "${var.project}-${var.environment}-${var.user_id}"
+}
+
+data "aws_subnet" "one_zone_private" {
+  id = var.networking_module.one_zone_private_subnet_id
 }
 
 resource "aws_iam_role" "sftp_user" {
-  name = "${var.project}-${var.environment}-${var.user_id}-sftp-user-role"
+  name = "${local.name_prefix}-sftp-user-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -30,7 +35,7 @@ resource "aws_iam_role" "sftp_user" {
   })
 
   inline_policy {
-    name = "${var.project}-${var.environment}-${var.user_id}-sftp-user-policy"
+    name = "${local.name_prefix}-sftp-user-policy"
     policy = jsonencode({
       "Version" : "2012-10-17",
       "Statement" : [
@@ -82,7 +87,7 @@ resource "aws_transfer_ssh_key" "this" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.sftp_module.s3_bucket_prefix}${var.environment}-${var.user_id}${var.sftp_module.s3_bucket_suffix}"
+  bucket = "${local.name_prefix}-sftp"
 
   tags = {
     Project     = var.project

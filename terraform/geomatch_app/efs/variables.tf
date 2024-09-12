@@ -26,6 +26,14 @@ variable "read_replica_enabled" {
   default     = false
 }
 
+variable "extra_fs_policy_documents_json" {
+  type        = list(string)
+  # Really only used for datasync, which for some reason
+  # doesn't accept IAM role-based (and so have to set resource-based via file system policy)
+  description = "Extra file system policy documents. Input the 'json' attribute from data.aws_iam_policy_document"
+  default     = []
+}
+
 variable "efs_name_prefix" {
   # Should begin with '-' if present (i.e. "-sftp")
   type    = string

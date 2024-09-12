@@ -70,8 +70,21 @@ variable "efs_configs" {
     file_system_id = string
     volume_name    = string # Docker volume name
     mount_path     = string # Docker mount path (i.e. '/data')
-    root_directory = string # Path to mount on EFS (i.e. '/data')
-    read_only      = bool
+    # Path to mount on EFS (i.e. '/data')
+    # Will be created by the root user if it does not exist.
+    root_directory = string
+    # Grant root access to the EFS dir. Likely required if root_directory does not already exist.
+    root_access = bool
+    # If true, EFS will be mounted as read-only Docker volume.
+    read_only          = bool
+    mount_target_sg_id = string
+
+    # https://repost.aws/knowledge-center/efs-access-point-configurations
+    # Set the following uid/g variables to empty string to remove block
+    root_dir_creator_uid_gid_number     = string
+    root_dir_creation_posix_permissions = number
+    # Any client using this AP will act as logged-in user 
+    ap_user_uid_gid_number = string
   }))
   default = {}
 }

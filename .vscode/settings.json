@@ -3,6 +3,6 @@
         "*.sh.tpl": "shellscript"
     },
     "python.analysis.extraPaths": [
-        "./terraform/geomatch_app/dev_environment/lambda_source"
+        "./terraform/geomatch_app/sftp/lambda_source"
     ]
 }

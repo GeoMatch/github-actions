@@ -10,11 +10,12 @@ terraform {
 }
 
 locals {
-  vpc_id = var.networking_module.vpc_id
+  vpc_id      = var.networking_module.vpc_id
+  name_prefix = "${var.project}-${var.environment}"
 }
 
 resource "aws_security_group" "this" {
-  name   = "${var.project}-${var.environment}-sftp-sg"
+  name   = "${local.name_prefix}-sftp-sg"
   vpc_id = local.vpc_id
 
   ingress {
@@ -72,10 +73,10 @@ resource "aws_transfer_server" "this" {
 
   # TODO(#10): Add lambda to write to EFS 
   # workflow_details {
-    # on_upload {
-    #   execution_role = aws_iam_role.transfer_workflow.arn
-    #   workflow_id    = aws_transfer_workflow.post_upload.id
-    # }
+  #   on_upload {
+  #     execution_role = aws_iam_role.transfer_workflow.arn
+  #     workflow_id    = aws_transfer_workflow.post_upload.id
+  #   }
   # }
 
   tags = {

@@ -35,10 +35,9 @@ resource "aws_iam_role" "ecs_task" {
 }
 
 resource "aws_iam_role_policy" "s3" {
-  for_each = var.s3_configs
-
-  name = "${local.name_prefix}-s3-policy"
-  role = aws_iam_role.ecs_task.id
+  count = length(var.s3_configs) > 0 ? 1 : 0
+  name  = "${local.name_prefix}-s3-policy"
+  role  = aws_iam_role.ecs_task.id
 
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -54,34 +53,12 @@ resource "aws_iam_role_policy" "s3" {
       {
         "Action" : "s3:*",
         "Effect" : "Allow",
-        "Resource" : ["${each.value.arn}", "${each.value.arn}/*"]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "efs" {
-  for_each = aws_efs_access_point.this
-
-  name = "${local.name_prefix}-efs-policy"
-  role = aws_iam_role.ecs_task.id
-
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite"
-        ],
-        "Resource" : "*"
-        # "Resource" : var.efs_module.file_system_arn,
-        "Condition" : {
-          "StringEquals" : {
-            "elasticfilesystem:AccessPointArn" : each.value.arn
-          }
-        }
+        "Resource" : flatten([
+          for s3_name, s3_config in var.s3_configs : [
+            s3_config.arn,
+            "${s3_config.arn}/*"
+          ]
+        ])
       }
     ]
   })
@@ -284,9 +261,16 @@ resource "aws_ecs_service" "this" {
     subnets          = [aws_subnet.ecs.id]
     assign_public_ip = false
 
-    security_groups = [
-      aws_security_group.ecs.id,
-    ]
+    security_groups = flatten(concat(
+      [
+        aws_security_group.ecs.id,
+      ],
+      [
+        for efs_name, efs_config in var.efs_configs : [
+          efs_config.mount_target_sg_id
+        ]
+      ]
+    ))
   }
 
   load_balancer {
