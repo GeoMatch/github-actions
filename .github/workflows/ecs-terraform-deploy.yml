@@ -10,6 +10,10 @@ on:
         description: "Extra variables to pass to Terraform. (i.e. --var)"
         type: string
         default: ""
+      terraform_directory:
+        required: true
+        description: "Terraform project directory (i.e. './terraform')"
+        type: string
 
 jobs:
   terraform-deploy:
@@ -21,7 +25,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: ./terraform
+        working-directory: ${{ inputs.terraform_directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3

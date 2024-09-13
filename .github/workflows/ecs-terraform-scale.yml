@@ -11,6 +11,10 @@ on:
         description: "New memory (in MiB)."
         type: string
         default: ""
+      terraform_directory:
+        required: true
+        description: "Terraform project directory (i.e. './terraform')"
+        type: string
 
 # Essentially, just calls terraform apply with these new variables
 jobs:
@@ -59,3 +63,4 @@ jobs:
     with:
       version: ${{ needs.fetch-latest-release.outputs.latest_release_tag }}
       extra_vars: ${{ needs.prepare-vars.outputs.extra_vars }}
+      terraform_directory: ${{ inputs.terraform_directory }}

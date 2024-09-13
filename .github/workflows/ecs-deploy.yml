@@ -5,6 +5,10 @@ on:
         required: true
         description: "GeoMatch version tag to build for (i.e. v0.0.1)."
         type: string
+      terraform_directory:
+        required: true
+        description: "Terraform project directory (i.e. './terraform')"
+        type: string
 
 jobs:
   terraform-deploy:
@@ -13,6 +17,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ inputs.version }}
+      terraform_directory: ${{ inputs.terraform_directory }}
   ecs-run-migrate-and-static:
     name: "ECS Run migrate and collectstatic"
     needs: terraform-deploy
