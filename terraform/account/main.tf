@@ -13,10 +13,10 @@ terraform {
   required_version = ">= 1.1.8"
 }
 
-provider "aws" {
-  region  = "us-east-1"
-  profile = "terraform-global"
-}
+# provider "aws" {
+#   region  = "us-east-1"
+#   profile = "terraform-global"
+# }
 
 # module "us_east_1" {
 #   source = "./regional"
