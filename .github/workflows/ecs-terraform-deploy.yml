@@ -1,3 +1,8 @@
+# Runs 'terraform apply' with the newest version, runs Django's collectstatic on (new) ECS task, and then waits for the healthceck to pass
+
+# In order to run this, Terraform manages a role that this workflow will run with. It allows updating of an ECS task definition and service redeploy.
+# We would normally run Terraform with elevated permissions.
+
 on:
   workflow_call:
     inputs:
@@ -5,9 +10,17 @@ on:
         required: true
         description: "GeoMatch version tag to build for (i.e. v0.0.1)."
         type: string
-      extra_vars:
+      terraform_directory:
+        required: true
+        description: "Terraform project directory (i.e. './terraform')"
+        type: string
+      terraform_env_vars_dir:
+        required: true
+        description: "A path to a directory relative to terraform_directory (i.e. './env/prod') for environment specific tfvars. Expects 'backend_config.tfvars' and 'env.tfvars'"
+        type: string
+      extra_terraform_args:
         required: false
-        description: "Extra variables to pass to Terraform. (i.e. --var)"
+        description: "Extra variables to pass to Terraform. (i.e. --var='varname=val'). Will be applied last"
         type: string
         default: ""
 
@@ -21,7 +34,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: ./terraform
+        working-directory: ${{ inputs.terraform_directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,9 +48,14 @@ jobs:
           role-session-name: ECSDeployTerraformPlan
           role-duration-seconds: 1000
       - name: Terraform Init
-        run: terraform init -backend-config=./prod.backend.auto.tfvars
+        run: terraform init -backend-config=${{ inputs.terraform_env_vars_dir }}/backend_config.tfvars
       - name: Terraform Plan
-        run: terraform plan -var="geomatch_version=${{ inputs.version }}" ${{ inputs.extra_vars }} -out prod.plan
+        run: >-
+          terraform plan
+          -var-file="${{ inputs.terraform_env_vars_dir }}/env.tfvars"
+          -var="geomatch_version=${{ inputs.version }}"
+          ${{ inputs.extra_terraform_args }}
+          -out prod.plan
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

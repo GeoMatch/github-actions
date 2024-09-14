@@ -1,3 +1,5 @@
+# Runs 'terraform apply' with the newest version, runs Django's collectstatic on (new) ECS task, and then waits for the healthceck to pass
+
 on:
   workflow_call:
     inputs:
@@ -5,6 +7,19 @@ on:
         required: true
         description: "GeoMatch version tag to build for (i.e. v0.0.1)."
         type: string
+      terraform_directory:
+        required: true
+        description: "Terraform project directory (i.e. './terraform')"
+        type: string
+      terraform_env_vars_dir:
+        required: true
+        description: "A path to a directory (i.e. './terraform/env/prod') for environment specific tfvars. Expects 'backend_config.tfvars' and 'env.tfvars'"
+        type: string
+      extra_terraform_args:
+        required: false
+        description: "Extra variables to pass to Terraform. (i.e. --var='varname=val'). Will be applied last"
+        type: string
+        default: ""
 
 jobs:
   terraform-deploy:
@@ -13,6 +28,9 @@ jobs:
     secrets: inherit
     with:
       version: ${{ inputs.version }}
+      terraform_directory: ${{ inputs.terraform_directory }}
+      terraform_env_vars_dir: ${{ inputs.terraform_env_vars_dir }}
+      extra_terraform_args: ${{ inputs.extra_terraform_args }}
   ecs-run-migrate-and-static:
     name: "ECS Run migrate and collectstatic"
     needs: terraform-deploy

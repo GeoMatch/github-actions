@@ -1,3 +1,5 @@
+# Checks if a new commit is a 'release' commit, meaning it has '[release]' at the begginning of the commit message
+
 on:
   workflow_call:
     outputs:
