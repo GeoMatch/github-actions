@@ -1,3 +1,4 @@
+# This is mandated to be one-per account
 # TODO(P2): See if we can auto determine thumbprint:
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
