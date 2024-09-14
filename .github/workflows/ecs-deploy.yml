@@ -1,3 +1,5 @@
+# Runs 'terraform apply' with the newest version, runs Django's collectstatic on (new) ECS task, and then waits for the healthceck to pass
+
 on:
   workflow_call:
     inputs:

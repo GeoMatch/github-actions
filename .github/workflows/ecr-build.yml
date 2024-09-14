@@ -1,3 +1,5 @@
+# Builds an repo's Dockefile and pushes it to ECR (configured in Terraform via Github secrets)
+
 on:
   workflow_call:
     inputs:

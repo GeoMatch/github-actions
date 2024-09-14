@@ -1,3 +1,6 @@
+# Fetches the latest release (via git tag)
+# Used to know the currently launched version
+
 on:
   workflow_call:
     outputs:
@@ -5,7 +8,6 @@ on:
         description: "Get latest release tag from repository"
         value: ${{ jobs.fetch-latest-release.outputs.latest_release_tag }}
 
-# Essentially, just calls terraform apply with these new variables
 jobs:
   fetch-latest-release:
     runs-on: ubuntu-latest

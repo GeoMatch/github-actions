@@ -1,3 +1,5 @@
+# Runs an arbitrary Django management command on an ECS task 
+
 on:
   workflow_call:
     inputs:

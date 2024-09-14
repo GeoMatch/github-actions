@@ -1,3 +1,8 @@
+# Runs 'terraform apply' with the newest version, runs Django's collectstatic on (new) ECS task, and then waits for the healthceck to pass
+
+# In order to run this, Terraform manages a role that this workflow will run with. It allows updating of an ECS task definition and service redeploy.
+# We would normally run Terraform with elevated permissions.
+
 on:
   workflow_call:
     inputs:
