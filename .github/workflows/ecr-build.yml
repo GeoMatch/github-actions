@@ -100,6 +100,12 @@ jobs:
         # Creates alias of 'docker build' to 'docker buildx build'
         with:
           install: true
+      # Used for builds that require AWS access
+      - name: Set .aws/credentials
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY 
+          aws configure set region $AWS_REGION
       # TODO: Change back to setup of commit 314fea7adcc6a6bccc41cf86ba98203a3d383d9b
       # once https://github.com/aws/containers-roadmap/issues/876 is resolved.
       # Also gha cache has 7 day expiry fyi
@@ -110,6 +116,9 @@ jobs:
           context: .
           file: Dockerfile
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
+          secret-files: |
+            awsconfig=~./aws/config
+            awscreds=~./aws/credentials
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}"
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.target }}"
@@ -149,6 +158,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           install: true
+      # Used for builds that require AWS access
+      - name: Set .aws/credentials
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY 
+          aws configure set region $AWS_REGION
       - name: "Build Extra Target image"
         id: docker_build
         uses: docker/build-push-action@v3
@@ -156,6 +171,9 @@ jobs:
           context: .
           file: Dockerfile
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
+          secret-files: |
+            awsconfig=~./aws/config
+            awscreds=~./aws/credentials
           tags: |
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.version }}-${{ inputs.extra_target }}"
             "${{ secrets.AWS_GEOMATCH_ECR_REPO_URL }}:${{ inputs.extra_target }}"
