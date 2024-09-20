@@ -102,15 +102,34 @@ resource "aws_iam_role" "github_action_build" {
         "Version" : "2012-10-17",
         "Statement" : [
           {
-            "Action" : "s3:*",
-            "Effect" : "Allow",
-            "Resource" : flatten([
+            Action = [
+              "s3:GetBucketLocation",
+              "s3:ListBucket",
+              "s3:ListBucketMultipartUploads"
+            ],
+            Effect = "Allow",
+            Resource = flatten([
               for s3_arn in var.docker_build_readable_s3_arns : [
-                s3_arn,
+                s3_arn
+              ]
+            ])
+          },
+          {
+            Action = [
+              "s3:AbortMultipartUpload",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:GetObjectVersion",
+              "s3:GetObjectVersionTagging",
+              "s3:ListMultipartUploadParts"
+            ],
+            Effect = "Allow",
+            Resource = flatten([
+              for s3_arn in var.docker_build_readable_s3_arns : [
                 "${s3_arn}/*"
               ]
             ])
-          }
+          },
         ]
       })
     }
