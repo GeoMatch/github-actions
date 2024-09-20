@@ -94,6 +94,28 @@ resource "aws_iam_role" "github_action_build" {
     })
   }
 
+  dynamic "inline_policy" {
+    for_each = var.docker_build_readable_s3_arns
+    content {
+      name = "github-build-s3-policy-${index(var.docker_build_readable_s3_arns, inline_policy.value)}"
+      policy = jsonencode({
+        "Version" : "2012-10-17",
+        "Statement" : [
+          {
+            "Action" : "s3:*",
+            "Effect" : "Allow",
+            "Resource" : flatten([
+              for s3_arn in var.docker_build_readable_s3_arns : [
+                s3_arn,
+                "${s3_arn}/*"
+              ]
+            ])
+          }
+        ]
+      })
+    }
+  }
+
   inline_policy {
     name = "github-sm-build-policy"
     policy = jsonencode({

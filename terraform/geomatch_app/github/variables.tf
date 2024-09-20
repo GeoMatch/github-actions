@@ -85,3 +85,8 @@ variable "extra_secrets" {
   }))
   default = []
 }
+
+variable "docker_build_readable_s3_arns" {
+  type    = list(string)
+  default = []
+}
