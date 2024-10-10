@@ -94,18 +94,18 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_ingress_nfs" {
   }
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_egress_github_git_ipv4" {
-  count             = length(data.github_ip_ranges.this.git_ipv4)
-  security_group_id = aws_security_group.ecs.id
-  description       = "Github git IPV4 traffick"
-  cidr_ipv4         = element(data.github_ip_ranges.this.git_ipv4, count.index)
-  ip_protocol       = "-1"
-  tags = {
-    Project     = var.project
-    Environment = var.environment
-    Name        = "${var.project}-${var.environment}-${var.name}-ecs-egress-gh-ipv4"
-  }
-}
+# resource "aws_vpc_security_group_egress_rule" "ecs_egress_github_git_ipv4" {
+#   count             = length(data.github_ip_ranges.this.git_ipv4)
+#   security_group_id = aws_security_group.ecs.id
+#   description       = "Github git IPV4 traffick"
+#   cidr_ipv4         = element(data.github_ip_ranges.this.git_ipv4, count.index)
+#   ip_protocol       = "-1"
+#   tags = {
+#     Project     = var.project
+#     Environment = var.environment
+#     Name        = "${var.project}-${var.environment}-${var.name}-ecs-egress-gh-ipv4"
+#   }
+# }
 # resource "aws_vpc_security_group_egress_rule" "ecs_egress_github_git_ipv6" {
 #   count             = length(data.github_ip_ranges.this.git_ipv6)
 #   security_group_id = aws_security_group.ecs.id
