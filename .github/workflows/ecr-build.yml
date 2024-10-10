@@ -181,7 +181,7 @@ jobs:
     needs: [check]
     if: needs.check.outputs.already-built == 'false' || inputs.skip_check == true
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240
     permissions:
       id-token: write
       contents: read
