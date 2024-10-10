@@ -14,6 +14,19 @@ data "aws_iam_policy_document" "github_actions" {
       values   = ["repo:${local.app_repo}:*"]
     }
   }
+  dynamic "statement" {
+    for_each = var.additional_trusted_role_arns
+    content {
+      effect = "Allow"
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [each.value]
+      }
+    }
+  }
 }
 
 

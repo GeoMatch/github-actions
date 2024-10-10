@@ -90,3 +90,10 @@ variable "docker_build_readable_s3_arns" {
   type    = list(string)
   default = []
 }
+
+# See https://stackoverflow.com/questions/41337079/how-enable-access-to-aws-sts-assumerole
+variable "additional_trusted_role_arns" {
+  type        = list(string)
+  description = "Additional arns to add to the trust relationship of the github actions role. Useful for local debugging."
+  default     = []
+}
