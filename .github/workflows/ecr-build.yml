@@ -200,6 +200,10 @@ jobs:
       - name: Docker Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/arm64
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
@@ -211,7 +215,7 @@ jobs:
       # Also gha cache has 7 day expiry fyi
       - name: "Build '${{ inputs.target }}' Mac image"
         id: docker_build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
