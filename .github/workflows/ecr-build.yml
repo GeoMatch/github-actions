@@ -216,7 +216,7 @@ jobs:
           context: .
           file: Dockerfile
           build-args: ${{ env.DOCKER_BUILD_ARGS }}
-          platforms: linux/amd64
+          platforms: linux/arm64
           secrets: |
             keyid=${{ steps.creds.outputs.aws-access-key-id }}
             accesskey=${{ steps.creds.outputs.aws-secret-access-key }}
