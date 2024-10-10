@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "github_actions" {
       ]
       principals {
         type        = "AWS"
-        identifiers = [each.value]
+        identifiers = [statement.value]
       }
     }
   }
