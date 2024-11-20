@@ -26,7 +26,7 @@ jobs:
     name: "ECS Run"
     runs-on: ubuntu-latest
     # Long for reinit pipeline. Consider making it configurable
-    timeout-minutes: 40
+    timeout-minutes: 180
     permissions:
       id-token: write
       contents: read
