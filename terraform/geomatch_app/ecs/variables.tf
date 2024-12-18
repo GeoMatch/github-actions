@@ -122,3 +122,7 @@ variable "alb_certificate_arn" {
   default     = null
 }
 
+ variable "cognito_client_id" {
+  type        = string
+  description = "AWS Cognito App Client ID"
+}
