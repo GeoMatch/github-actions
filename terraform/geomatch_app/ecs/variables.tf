@@ -122,7 +122,42 @@ variable "alb_certificate_arn" {
   default     = null
 }
 
- variable "cognito_client_id" {
+variable "cognito_client_id" {
   type        = string
   description = "AWS Cognito App Client ID"
+}
+
+variable "cognito_region" {
+  description = "The AWS region where Cognito is deployed"
+  type        = string
+}
+
+variable "cognito_user_pool_id" {
+  description = "The Cognito User Pool ID"
+  type        = string
+}
+
+variable "cognito_client_secret" {
+  description = "The Cognito Client Secret"
+  type        = string
+}
+
+variable "cognito_redirect_uri" {
+  description = "The Cognito Redirect URI"
+  type        = string
+}
+
+variable "cognito_app_domain" {
+  description = "The Cognito App Domain"
+  type        = string
+}
+
+variable "cognito_authorization_endpoint" {
+  description = "The Cognito Authorization Endpoint"
+  type        = string
+}
+
+variable "cognito_allow_domain" {
+  description = "The Cognito Allow Domain"
+  type        = string
 }
