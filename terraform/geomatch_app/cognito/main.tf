@@ -32,9 +32,57 @@ resource "aws_cognito_user_pool" "this" {
     }
   }
 
-  email_verification_message = "Your verification code is {####}"
-  email_verification_subject = "Your verification code"
+  password_policy {
+    minimum_length    = 10
+    require_uppercase = true
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = true
+  }
 
+  username_configuration {
+    case_sensitive = false
+  }
+
+  verification_message_template {
+    default_email_option = "CONFIRM_WITH_CODE"
+    email_message = "Your verification code is {####}"
+    email_subject = "Your verification code"
+  }
+
+  schema {
+    name = "email"
+    required = true
+    mutable = true
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 2048
+    }
+  }
   
+  tags = {
+    Terraform = true
+    Environment = var.environment
+  }
 
+resource "aws_cognito_user_pool_client" "this" {
+  name = "${var.project}-${var.environment}-cognito-client"
+  user_pool_id = aws_cognito_user_pool.this.id
+  generate_secret = true
+  callback_urls = [var.cognito_module.cognito_redirect_uri]
+  logout_urls = [var.cognito_module.cognito_redirect_uri]
+  allowed_oauth_flows = ["code"]
+  allowed_oauth_scopes = ["email", "openid"]
+  allowed_oauth_flows_user_pool_client = true
+}
+
+resource "aws_cognito_user_pool_domain" "this" {
+  domain = "${var.project}-${var.environment}-cognito"
+  user_pool_id = aws_cognito_user_pool.this.id
+}
+
+resource "aws_cognito_user_pool_client_domain" "this" {
+  domain = "${var.project}-${var.environment}-cognito"
+  user_pool_id = aws_cognito_user_pool.this.id
+  client_id = aws_cognito_user_pool_client.this.id
 }
