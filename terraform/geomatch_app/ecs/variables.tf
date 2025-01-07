@@ -122,7 +122,8 @@ variable "alb_certificate_arn" {
   default     = null
 }
 
-variable "cognito_client_id" {
+/*
+  variable "cognito_client_id" {
   type        = string
   description = "AWS Cognito App Client ID"
 }
@@ -160,4 +161,6 @@ variable "cognito_authorization_endpoint" {
 variable "cognito_allow_domain" {
   description = "The Cognito Allow Domain"
   type        = string
-}
+} 
+
+*/

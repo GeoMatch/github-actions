@@ -32,4 +32,9 @@ resource "aws_cognito_user_pool" "this" {
     }
   }
 
+  email_verification_message = "Your verification code is {####}"
+  email_verification_subject = "Your verification code"
+
+  
+
 }
