@@ -68,6 +68,19 @@ variable "ses_module" {
   })
 }
 
+variable "cognito_module" {
+  type = object({
+    cognito_redirect_uri = string
+    cognito_region = string
+    cognito_client_id = string
+    cognito_user_pool_id = string
+    cognito_client_secret = string
+    cognito_app_domain = string
+    cognito_authorization_endpoint = string
+    cognito_allow_domain = string
+  })
+}
+
 variable "efs_module" {
   sensitive = true
   type = object({
