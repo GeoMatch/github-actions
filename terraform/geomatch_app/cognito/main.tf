@@ -64,6 +64,7 @@ resource "aws_cognito_user_pool" "this" {
     Terraform = true
     Environment = var.environment
   }
+}
 
 resource "aws_cognito_user_pool_client" "this" {
   name = "${var.project}-${var.environment}-cognito-client"
