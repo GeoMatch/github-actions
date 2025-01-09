@@ -28,7 +28,7 @@ output "cognito_client_id" {
 
 output "cognito_user_pool_id" {
   description = "The Cognito User Pool ID"
-  value       = aws_cognito_user_pool.pool.id
+  value       = aws_cognito_user_pool.this.id
 }
 
 # Add other required outputs
