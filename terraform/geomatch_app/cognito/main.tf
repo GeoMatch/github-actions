@@ -71,8 +71,8 @@ resource "aws_cognito_user_pool_client" "this" {
   name = "${var.project}-${var.environment}-cognito-client"
   user_pool_id = aws_cognito_user_pool.this.id
   generate_secret = true
-  callback_urls = [var.cognito_module.cognito_redirect_uri]
-  logout_urls = [var.cognito_module.cognito_redirect_uri]
+  callback_urls = [var.cognito_redirect_uri]
+  logout_urls = [var.cognito_redirect_uri]
   allowed_oauth_flows = ["code"]
   allowed_oauth_scopes = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
