@@ -64,26 +64,27 @@ resource "aws_cognito_user_pool" "this" {
     Terraform = true
     Environment = var.environment
   }
-}
 
-resource "aws_cognito_user_pool_client" "this" {
-  name = "${var.project}-${var.environment}-cognito-client"
-  user_pool_id = aws_cognito_user_pool.this.id
-  generate_secret = true
-  callback_urls = [var.cognito_module.cognito_redirect_uri]
-  logout_urls = [var.cognito_module.cognito_redirect_uri]
-  allowed_oauth_flows = ["code"]
-  allowed_oauth_scopes = ["email", "openid"]
-  allowed_oauth_flows_user_pool_client = true
-}
 
-resource "aws_cognito_user_pool_domain" "this" {
-  domain = "${var.project}-${var.environment}-cognito"
-  user_pool_id = aws_cognito_user_pool.this.id
-}
+  resource "aws_cognito_user_pool_client" "this" {
+    name = "${var.project}-${var.environment}-cognito-client"
+    user_pool_id = aws_cognito_user_pool.this.id
+    generate_secret = true
+    callback_urls = [var.cognito_module.cognito_redirect_uri]
+    logout_urls = [var.cognito_module.cognito_redirect_uri]
+    allowed_oauth_flows = ["code"]
+    allowed_oauth_scopes = ["email", "openid"]
+    allowed_oauth_flows_user_pool_client = true
+  }
 
-resource "aws_cognito_user_pool_client_domain" "this" {
-  domain = "${var.project}-${var.environment}-cognito"
-  user_pool_id = aws_cognito_user_pool.this.id
-  client_id = aws_cognito_user_pool_client.this.id
+  resource "aws_cognito_user_pool_domain" "this" {
+    domain = "${var.project}-${var.environment}-cognito"
+    user_pool_id = aws_cognito_user_pool.this.id
+  }
+
+  resource "aws_cognito_user_pool_client_domain" "this" {
+    domain = "${var.project}-${var.environment}-cognito"
+    user_pool_id = aws_cognito_user_pool.this.id
+    client_id = aws_cognito_user_pool_client.this.id
+  }
 }
