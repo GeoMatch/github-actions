@@ -23,7 +23,7 @@ output "cognito_region" {
 
 output "cognito_client_id" {
   description = "The Cognito User Pool Client ID"
-  value       = aws_cognito_user_pool_client.client.id
+  value       = aws_cognito_user_pool_client.this.id
 }
 
 output "cognito_user_pool_id" {
@@ -34,7 +34,7 @@ output "cognito_user_pool_id" {
 # Add other required outputs
 output "cognito_client_secret" {
   description = "The Cognito User Pool Client Secret"
-  value       = aws_cognito_user_pool_client.client.client_secret
+  value       = aws_cognito_user_pool_client.this.client_secret
   sensitive   = true
 }
 
@@ -45,12 +45,12 @@ output "cognito_redirect_uri" {
 
 output "cognito_app_domain" {
   description = "The Cognito app domain"
-  value       = aws_cognito_user_pool_domain.main.domain
+  value       = aws_cognito_user_pool_domain.this.domain
 }
 
 output "cognito_authorization_endpoint" {
   description = "The Cognito authorization endpoint"
-  value       = "${aws_cognito_user_pool.pool.endpoint}/oauth2/authorize"
+  value       = "${aws_cognito_user_pool.this.endpoint}/oauth2/authorize"
 }
 
 output "cognito_allow_domain" {
