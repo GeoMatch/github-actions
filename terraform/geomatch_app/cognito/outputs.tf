@@ -40,7 +40,7 @@ output "cognito_client_secret" {
 
 output "cognito_redirect_uri" {
   description = "The Cognito redirect URI"
-  value       = var.redirect_uri
+  value       = var.cognito_redirect_uri
 }
 
 output "cognito_app_domain" {
@@ -55,5 +55,5 @@ output "cognito_authorization_endpoint" {
 
 output "cognito_allow_domain" {
   description = "The allowed domain for Cognito"
-  value       = var.allow_domain
+  value       = var.cognito_allow_domain
 }
