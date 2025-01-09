@@ -52,6 +52,7 @@ resource "aws_cognito_user_pool" "this" {
 
   schema {
     name = "email"
+    attribute_data_type = "String"
     required = true
     mutable = true
     string_attribute_constraints {
@@ -80,10 +81,4 @@ resource "aws_cognito_user_pool_client" "this" {
 resource "aws_cognito_user_pool_domain" "this" {
   domain = "${var.project}-${var.environment}-cognito"
   user_pool_id = aws_cognito_user_pool.this.id
-}
-
-resource "aws_cognito_user_pool_client_domain" "this" {
-  domain = "${var.project}-${var.environment}-cognito"
-  user_pool_id = aws_cognito_user_pool.this.id
-  client_id = aws_cognito_user_pool_client.this.id
 }
