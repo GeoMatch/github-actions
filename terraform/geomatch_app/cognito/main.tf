@@ -16,6 +16,7 @@ terraform {
 
 resource "aws_cognito_user_pool" "this" {
   name = "${var.project}-${var.environment}-cognito"
+  mfa_configuration = "ON"
 
   account_recovery_setting {
     recovery_mechanism {
@@ -33,7 +34,7 @@ resource "aws_cognito_user_pool" "this" {
   }
 
   password_policy {
-    minimum_length    = 10
+    minimum_length    = 8
     require_uppercase = true
     require_lowercase = true
     require_numbers   = true
