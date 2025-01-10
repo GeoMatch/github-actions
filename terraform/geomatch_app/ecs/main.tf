@@ -255,6 +255,38 @@ resource "aws_ecs_task_definition" "this" {
           "name" : "EMAIL_HOST_PASSWORD",
           "value" : var.ses_module.smtp_host_password
         },
+        {
+          "name" : "COGNITO_REGION",
+          "value" : var.cognito_module.cognito_region
+        },
+        {
+          "name" : "COGNITO_CLIENT_ID",
+          "value" : var.cognito_module.cognito_client_id
+        },
+        {
+          "name" : "COGNITO_USER_POOL_ID",
+          "value" : var.cognito_module.cognito_user_pool_id
+        },
+        {
+          "name" : "COGNITO_CLIENT_SECRET",
+          "value" : var.cognito_module.cognito_client_secret
+        },
+        {
+          "name" : "COGNITO_REDIRECT_URI",
+          "value" : var.cognito_module.cognito_redirect_uri
+        },
+        {
+          "name" : "COGNITO_APP_DOMAIN",
+          "value" : var.cognito_module.cognito_app_domain
+        },
+        {
+          "name" : "COGNITO_AUTHORIZATION_ENDPOINT",
+          "value" : var.cognito_module.cognito_authorization_endpoint
+        },
+        {
+          "name" : "COGNITO_ALLOW_DOMAIN",
+          "value" : var.cognito_module.cognito_allow_domain
+        },           
       ],
       "secrets" : [
         {
