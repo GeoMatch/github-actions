@@ -81,3 +81,13 @@ variable "cognito_admin_create_user_subject" {
 variable "cognito_allow_email_address" {
   type = string
 }
+
+variable "subdomain" {
+  description = "Subdomain for the application (e.g., 'us')"
+  type        = string
+}
+
+variable "domain" {
+  description = "The domain for the Cognito callback URLs"
+  type        = string
+}
