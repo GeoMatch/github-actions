@@ -76,11 +76,17 @@ resource "aws_cognito_user_pool_client" "this" {
   name = "${var.project}-${var.environment}-cognito-client"
   user_pool_id = aws_cognito_user_pool.this.id
   generate_secret = true
-  callback_urls = [var.cognito_redirect_uri]
-  logout_urls = [var.cognito_redirect_uri]
+  callback_urls = ["https://${var.subdomain}.${var.domain}/auth/callback"]
+  logout_urls = ["https://${var.subdomain}.${var.domain}/auth/login"]
   allowed_oauth_flows = ["code"]
   allowed_oauth_scopes = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH", # Allow username/password authentication
+    "ALLOW_USER_SRP_AUTH",      # Allow Secure Remote Password authentication
+    "ALLOW_REFRESH_TOKEN_AUTH"  # Recommended for token refresh functionality
+  ]
 }
 
 resource "aws_cognito_user_pool_domain" "this" {
