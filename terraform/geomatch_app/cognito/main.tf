@@ -18,6 +18,10 @@ resource "aws_cognito_user_pool" "this" {
   name = "${var.project}-${var.environment}-cognito"
   mfa_configuration = "ON"
 
+  software_token_mfa_configuration {
+    enabled = true
+  }
+
   account_recovery_setting {
     recovery_mechanism {
       name     = "admin_only"
